@@ -50,14 +50,43 @@ See how a classic genetic algorithm gradually improves its solution while remain
   - **Step**: Advance one generation at a time for detailed inspection
   - **Reset**: Clear all progress and start fresh
 
+## Quick Start
+
+⚠️ **Important**: This app uses ES6 modules and **must be served over HTTP**. Do not open `index.html` directly as a file (`file://` URLs will fail).
+
+### Easiest Method: Use startup scripts
+```bash
+# On Windows
+start.bat
+
+# On macOS/Linux
+./start.sh
+```
+
+### Manual Server Startup
+
+**Option 1: Python** (most systems have this)
+```bash
+python -m http.server 8000
+# Then open http://localhost:8000 in your browser
+```
+
+**Option 2: Node.js**
+```bash
+npx http-server -p 8000
+# Then open http://localhost:8000 in your browser
+```
+
 ## How to Use
 
-1. **Open `index.html`** in any modern browser (no build step required)
-2. **Configure cities** using the City section (randomize or click to add)
-3. **Run brute force** to find the optimal solution (best for small city counts: 3–12)
-4. **Adjust GA parameters** to your preference
-5. **Start the genetic algorithm** and watch it evolve
-6. **Compare**: View the GA's best solution against the brute-force optimum
+1. After starting the server, open **http://localhost:8000** in your browser
+2. **Configure cities** using the City section:
+   - Click "Randomize" to auto-generate cities, or
+   - Toggle "Click to Add" and click the canvas to manually place cities
+3. **Run brute force** to find the optimal solution (works best for 3–12 cities)
+4. **Adjust GA parameters** to your preference (population, generations, mutation rate, etc.)
+5. **Start the genetic algorithm** and watch it evolve toward the optimum
+6. **Compare**: View the GA's best solution against the brute-force result
 
 ## Project Structure
 
