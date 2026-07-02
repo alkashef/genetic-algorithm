@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TSP Genetic Algorithm Visualizer</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header>
+  <h1>Traveling Salesman Problem &mdash; GA Visualizer</h1>
+  <p class="subtitle">Place cities, find the exact optimum by brute force, then watch a classic genetic algorithm evolve toward it.</p>
+</header>
+
+<main>
+
+  <!-- ============ 1. CITY SETUP ============ -->
+  <section id="setup" class="panel">
+    <h2>1. Cities</h2>
+    <div class="controls">
+      <label>Number of cities
+        <input type="number" id="cityCount" min="2" max="200" value="6" />
+      </label>
+      <button id="randomizeBtn">Randomize</button>
+      <button id="placeModeBtn" class="toggle">Click to Add</button>
+      <button id="clearBtn">Clear</button>
+      <span class="stat">Cities: <span id="cityCounter">0</span></span>
+    </div>
+    <canvas id="setupCanvas" width="640" height="420"></canvas>
+  </section>
+
+  <!-- ============ 2. BRUTE FORCE ============ -->
+  <section id="bruteforce" class="panel">
+    <h2>2. Brute Force (Exact Optimum)</h2>
+    <p class="hint">Enumerates every route (start city fixed, mirror routes skipped). Route count grows factorially &mdash; large city counts can take a long time.</p>
+    <div class="controls">
+      <button id="bfRunBtn">Run</button>
+      <button id="bfStopBtn" disabled>Stop</button>
+    </div>
+    <div class="log">
+      <div id="bfTotalLine">Total routes: &mdash;</div>
+      <div id="bfCurrentLine" class="log-line">Current: &mdash;</div>
+      <div id="bfBestLine">Best so far: &mdash;</div>
+    </div>
+    <canvas id="bfCanvas" width="640" height="420"></canvas>
+  </section>
+
+  <!-- ============ 3. GENETIC ALGORITHM ============ -->
+  <section id="ga" class="panel">
+    <h2>3. Genetic Algorithm</h2>
+    <div class="controls ga-params">
+      <label>Population
+        <input type="number" id="gaPopSize" min="4" max="2000" value="120" />
+      </label>
+      <label>Max generations
+        <input type="number" id="gaMaxGen" min="1" max="100000" value="400" />
+      </label>
+      <label>Crossover rate
+        <input type="number" id="gaCrossoverRate" min="0" max="1" step="0.05" value="0.9" />
+      </label>
+      <label>Mutation rate
+        <input type="number" id="gaMutationRate" min="0" max="1" step="0.01" value="0.02" />
+      </label>
+      <label>Selection
+        <select id="gaSelection">
+          <option value="tournament" selected>Tournament</option>
+          <option value="roulette">Roulette Wheel</option>
+        </select>
+      </label>
+      <label id="gaTournamentSizeWrap">Tournament size
+        <input type="number" id="gaTournamentSize" min="2" max="50" value="5" />
+      </label>
+      <label><input type="checkbox" id="gaElitism" checked /> Elitism</label>
+      <label>Speed
+        <input type="range" id="gaSpeed" min="0" max="500" value="60" />
+      </label>
+    </div>
+    <div class="controls">
+      <button id="gaStartBtn">Start</button>
+      <button id="gaPauseBtn" disabled>Pause</button>
+      <button id="gaStepBtn">Step</button>
+      <button id="gaResetBtn">Reset</button>
+    </div>
+    <div class="log">
+      <div id="gaStatsLine">Generation: 0 &nbsp;|&nbsp; Best: &mdash; &nbsp;|&nbsp; Avg: &mdash;</div>
+    </div>
+    <div class="ga-view">
+      <canvas id="gaCanvas" width="420" height="420"></canvas>
+      <canvas id="gaChart" width="420" height="420"></canvas>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>Vanilla HTML / CSS / JS &mdash; no frameworks, no build step.</p>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
