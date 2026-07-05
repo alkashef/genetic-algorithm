@@ -12,17 +12,22 @@
   <p class="subtitle">Place cities, find the exact optimum by brute force, then watch a classic genetic algorithm evolve toward it.</p>
 </header>
 
+<nav class="tabs" role="tablist">
+  <button class="tab active" data-tab="setup">Cities</button>
+  <button class="tab" data-tab="bruteforce">Brute Force</button>
+  <button class="tab" data-tab="ga">Genetic Algorithm</button>
+</nav>
+
 <main>
 
   <!-- ============ 1. CITY SETUP ============ -->
-  <section id="setup" class="panel">
+  <section id="setup" class="panel tab-panel active">
     <h2>1. Cities</h2>
     <div class="controls">
       <label>Number of cities
         <input type="number" id="cityCount" min="2" max="200" value="6" />
       </label>
       <button id="randomizeBtn">Randomize</button>
-      <button id="placeModeBtn" class="toggle">Click to Add</button>
       <button id="clearBtn">Clear</button>
       <span class="stat">Cities: <span id="cityCounter">0</span></span>
     </div>
@@ -30,23 +35,28 @@
   </section>
 
   <!-- ============ 2. BRUTE FORCE ============ -->
-  <section id="bruteforce" class="panel">
+  <section id="bruteforce" class="panel tab-panel">
     <h2>2. Brute Force (Exact Optimum)</h2>
     <p class="hint">Enumerates every route (start city fixed, mirror routes skipped). Route count grows factorially &mdash; large city counts can take a long time.</p>
     <div class="controls">
-      <button id="bfRunBtn">Run</button>
-      <button id="bfStopBtn" disabled>Stop</button>
+      <button id="bfSolveBtn">Solve</button>
+      <label>Step delay (seconds)
+        <input type="number" id="bfStepDelay" min="0" max="60" step="0.1" value="3" />
+      </label>
     </div>
-    <div class="log">
-      <div id="bfTotalLine">Total routes: &mdash;</div>
-      <div id="bfCurrentLine" class="log-line">Current: &mdash;</div>
-      <div id="bfBestLine">Best so far: &mdash;</div>
+    <div class="bf-view">
+      <canvas id="bfCanvas" width="640" height="420"></canvas>
+      <div class="bf-stats">
+        <div class="bf-stat">Total number of routes = <span id="bfTotalVal">&mdash;</span></div>
+        <div class="bf-stat">Current route = <span id="bfCurrentVal">&mdash;</span></div>
+        <div class="bf-stat">Current route distance = <span id="bfCurrentDistVal">&mdash;</span></div>
+        <div class="bf-stat">Best Distance = <span id="bfBestVal">&mdash;</span></div>
+      </div>
     </div>
-    <canvas id="bfCanvas" width="640" height="420"></canvas>
   </section>
 
   <!-- ============ 3. GENETIC ALGORITHM ============ -->
-  <section id="ga" class="panel">
+  <section id="ga" class="panel tab-panel">
     <h2>3. Genetic Algorithm</h2>
     <div class="controls ga-params">
       <label>Population
@@ -71,22 +81,39 @@
         <input type="number" id="gaTournamentSize" min="2" max="50" value="5" />
       </label>
       <label><input type="checkbox" id="gaElitism" checked /> Elitism</label>
-      <label>Speed
-        <input type="range" id="gaSpeed" min="0" max="500" value="60" />
-      </label>
     </div>
     <div class="controls">
-      <button id="gaStartBtn">Start</button>
-      <button id="gaPauseBtn" disabled>Pause</button>
-      <button id="gaStepBtn">Step</button>
+      <button id="gaStepBtn">Initialize</button>
+      <button id="gaFastBtn">Fast forward</button>
       <button id="gaResetBtn">Reset</button>
     </div>
-    <div class="log">
-      <div id="gaStatsLine">Generation: 0 &nbsp;|&nbsp; Best: &mdash; &nbsp;|&nbsp; Avg: &mdash;</div>
-    </div>
-    <div class="ga-view">
+    <p class="hint">Step through one phase at a time, or Fast forward to run automatically (paced by the step delay below).</p>
+    <div class="bf-view">
       <canvas id="gaCanvas" width="420" height="420"></canvas>
-      <canvas id="gaChart" width="420" height="420"></canvas>
+      <div class="bf-stats">
+        <div class="bf-stat">Generation = <span id="gaGenVal">0</span></div>
+        <div class="bf-stat">Best distance = <span id="gaBestVal">&mdash;</span></div>
+        <div class="bf-stat">Average distance = <span id="gaAvgVal">&mdash;</span></div>
+      </div>
+    </div>
+    <div class="ga-chart-row">
+      <canvas id="gaChart" width="860" height="360"></canvas>
+    </div>
+
+    <h3 class="ga-genomes-title">Population genomes</h3>
+    <div class="ga-genomes">
+      <div class="genome-list" id="gaGenomeList"></div>
+      <div class="genome-info">
+        <div class="bf-stat">Generation = <span id="gaGenomeGen">0</span></div>
+        <div class="bf-stat">Population = <span id="gaGenomePop">0</span></div>
+        <label>Step delay (seconds)
+          <input type="number" id="gaStepDelay" min="0" max="60" step="0.1" value="0.5" />
+        </label>
+        <div class="genome-legend">
+          <span><span class="swatch crossover"></span> crossover segment</span>
+          <span><span class="swatch mutation"></span> mutation swap</span>
+        </div>
+      </div>
     </div>
   </section>
 

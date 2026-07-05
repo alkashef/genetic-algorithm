@@ -25,7 +25,7 @@ export function drawCities(ctx, canvas, cities, { radius = 5, color = "#e6e9f0",
   });
 }
 
-export function drawCompleteGraph(ctx, canvas, cities, { color = "rgba(79,157,255,0.12)" } = {}) {
+export function drawCompleteGraph(ctx, canvas, cities, { color = "rgba(79,157,255,0.12)", showDistances = false, distMatrix = null } = {}) {
   ctx.strokeStyle = color;
   ctx.lineWidth = 1;
   for (let i = 0; i < cities.length; i++) {
@@ -36,6 +36,15 @@ export function drawCompleteGraph(ctx, canvas, cities, { color = "rgba(79,157,25
       ctx.moveTo(a.x, a.y);
       ctx.lineTo(b.x, b.y);
       ctx.stroke();
+
+      if (showDistances && distMatrix) {
+        const dist = Math.round(distMatrix[i][j] * 1000);
+        const midX = (a.x + b.x) / 2;
+        const midY = (a.y + b.y) / 2;
+        ctx.fillStyle = "rgba(79,157,255,0.6)";
+        ctx.font = "10px monospace";
+        ctx.fillText(String(dist), midX + 2, midY - 2);
+      }
     }
   }
 }

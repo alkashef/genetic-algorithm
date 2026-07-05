@@ -54,16 +54,7 @@ See how a classic genetic algorithm gradually improves its solution while remain
 
 ⚠️ **Important**: This app uses ES6 modules and **must be served over HTTP**. Do not open `index.html` directly as a file (`file://` URLs will fail).
 
-### Easiest Method: Use startup scripts
-```bash
-# On Windows
-start.bat
-
-# On macOS/Linux
-./start.sh
-```
-
-### Manual Server Startup
+Start a local web server from the project directory, then open the app in your browser.
 
 **Option 1: Python** (most systems have this)
 ```bash

@@ -4,7 +4,7 @@ export function drawFitnessChart(ctx, canvas, bestHistory, avgHistory) {
   const { width, height } = canvas;
   ctx.clearRect(0, 0, width, height);
 
-  const padding = { top: 16, right: 12, bottom: 24, left: 46 };
+  const padding = { top: 20, right: 18, bottom: 46, left: 66 };
   const plotW = width - padding.left - padding.right;
   const plotH = height - padding.top - padding.bottom;
 
@@ -32,11 +32,34 @@ export function drawFitnessChart(ctx, canvas, bestHistory, avgHistory) {
   ctx.lineTo(padding.left + plotW, padding.top + plotH);
   ctx.stroke();
 
+  // Distance shown in the same ×1000 units as the stat cards.
+  const scaled = (v) => Math.round(v * 1000).toLocaleString();
+
+  // Y-axis top tick (max). The bottom tick is the marked best value (drawn below).
   ctx.fillStyle = "#8a92a8";
   ctx.font = "10px monospace";
-  ctx.fillText(maxVal.toFixed(0), 2, padding.top + 4);
-  ctx.fillText(minVal.toFixed(0), 2, padding.top + plotH);
-  ctx.fillText(`gen ${bestHistory.length - 1}`, padding.left + plotW - 40, height - 6);
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  ctx.fillText(scaled(maxVal), padding.left - 8, padding.top);
+
+  // X-axis start tick. The best generation is marked below.
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("0", padding.left, padding.top + plotH + 14);
+
+  // Axis titles
+  ctx.fillStyle = "#e6e9f0";
+  ctx.font = "11px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("Generation", padding.left + plotW / 2, height - 6);
+
+  ctx.save();
+  ctx.translate(14, padding.top + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("Distance", 0, 0);
+  ctx.restore();
 
   const drawLine = (data, color) => {
     ctx.strokeStyle = color;
@@ -51,11 +74,55 @@ export function drawFitnessChart(ctx, canvas, bestHistory, avgHistory) {
     ctx.stroke();
   };
 
+  // Plot the average line only; the best is marked, not plotted.
   drawLine(avgHistory, "#ff8a4f");
-  drawLine(bestHistory, "#4fd984");
 
+  // Find the best (minimum) point and mark its X (generation) and Y (distance).
+  let bestIdx = 0;
+  for (let i = 1; i < bestHistory.length; i++) {
+    if (bestHistory[i] < bestHistory[bestIdx]) bestIdx = i;
+  }
+  const bestVal = bestHistory[bestIdx];
+  const bx = xForIndex(bestIdx);
+  const by = yForValue(bestVal);
+
+  // Dashed guide lines: a full-height column marks the best generation (X),
+  // a level line marks the best distance (Y).
+  ctx.save();
+  ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = "rgba(79,217,132,0.7)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(bx, padding.top);
+  ctx.lineTo(bx, padding.top + plotH);
+  ctx.moveTo(padding.left, by);
+  ctx.lineTo(bx, by);
+  ctx.stroke();
+  ctx.restore();
+
+  // Marker dot at the best point.
   ctx.fillStyle = "#4fd984";
-  ctx.fillText("best", padding.left + 4, padding.top + 10);
+  ctx.beginPath();
+  ctx.arc(bx, by, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Coordinate labels for the marked best (green).
+  ctx.font = "10px monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(String(bestIdx), bx, padding.top + plotH + 14); // best generation on X
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  ctx.fillText(scaled(bestVal), padding.left - 8, by);         // best distance on Y
+
+  // Legend
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = "#4fd984";
+  ctx.beginPath();
+  ctx.arc(padding.left + 9, padding.top + 7, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.textAlign = "left";
+  ctx.fillText("best", padding.left + 16, padding.top + 10);
   ctx.fillStyle = "#ff8a4f";
-  ctx.fillText("avg", padding.left + 34, padding.top + 10);
+  ctx.fillText("avg", padding.left + 48, padding.top + 10);
 }

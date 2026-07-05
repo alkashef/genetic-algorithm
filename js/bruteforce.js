@@ -36,14 +36,15 @@ function* heapPermutations(arr) {
   }
 }
 
-function nextFrame() {
-  return new Promise((resolve) => setTimeout(resolve, 0));
+function nextFrame(delay = 0) {
+  return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
 // cityIndices: array of city indices to route, e.g. [0,1,2,...,n-1].
 // callbacks: { onTotal(total), onProgress(route, dist, count), onBest(route, dist, count), onDone(bestRoute, bestDist, count) }
 // shouldStop: () => boolean, checked periodically to allow cancellation.
-export async function runBruteForce(cityIndices, matrix, callbacks, shouldStop) {
+// stepDelay: delay in seconds between each step calculation (default: 3).
+export async function runBruteForce(cityIndices, matrix, callbacks, shouldStop, stepDelay = 3) {
   const start = cityIndices[0];
   const rest = cityIndices.slice(1);
   const total = countRoutes(cityIndices.length);
@@ -61,6 +62,7 @@ export async function runBruteForce(cityIndices, matrix, callbacks, shouldStop) 
   let bestRoute = null;
   let bestDist = Infinity;
   let lastUpdate = performance.now();
+  const stepDelayMs = stepDelay * 1000;
 
   for (const perm of heapPermutations(rest)) {
     if (shouldStop()) break;
@@ -79,10 +81,10 @@ export async function runBruteForce(cityIndices, matrix, callbacks, shouldStop) 
     }
 
     const now = performance.now();
-    if (now - lastUpdate > 25) {
+    if (count === 1 || now - lastUpdate > 25) {
       callbacks.onProgress(route, dist, count);
       lastUpdate = now;
-      await nextFrame();
+      await nextFrame(stepDelayMs);
     }
   }
 
