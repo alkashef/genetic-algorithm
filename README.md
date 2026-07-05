@@ -12,9 +12,10 @@ and its fitness history — against the known optimum.
 
 ## Stack
 
-- **Backend**: Python 3 (developed on 3.14), Flask 3.1.3, python-dotenv 1.2.2
+- **Backend**: Python 3 (developed on 3.14), Flask 3.1.3, python-dotenv 1.2.2, DEAP 1.4.1
 - **Frontend**: semantic HTML (Jinja2 template), modular CSS, JavaScript ES6+ modules
 - **Template engine**: Jinja2 (Flask default)
+- **Evolutionary computing**: DEAP (Distributed Evolutionary Algorithms in Python)
 - **Tests**: Python standard-library `unittest`
 - No JavaScript dependencies and no build step
 
@@ -88,10 +89,12 @@ evolution stage:
 
 ## Technical details
 
-**Genetic algorithm** — permutation encoding; tournament (configurable size) or
-roulette-wheel selection; Order Crossover (OX), which preserves relative city
-order; swap mutation; optional elitism. Fitness is the closed-tour distance
-(minimized).
+**Genetic algorithm** — implemented with DEAP framework; permutation encoding;
+tournament (configurable size) or roulette-wheel selection; Order Crossover (OX),
+which preserves relative city order; swap mutation; optional elitism. Fitness is
+the closed-tour distance (minimized). Evolution is split into discrete stages
+(init, evaluate, select, crossover, mutate) so the frontend can step through
+and visualize each one.
 
 **Brute force** — enumerates permutations via Heap's algorithm with the first
 city fixed and mirror-image routes skipped, exploring exactly **(n−1)!/2**

@@ -1,12 +1,14 @@
 # CLAUDE.md
 
 ## Project Overview
+
 This project is a web application with a Flask backend and an HTML/CSS/JS frontend.
 Claude assists as a coding partner with strict adherence to the principles below.
 
 ---
 
 ## Stack
+
 - **Backend**: Python 3, Flask
 - **Frontend**: HTML (semantic), CSS (modular), JavaScript (ES6+ modules)
 - **Template engine**: Jinja2 (Flask default)
@@ -42,12 +44,14 @@ Staff Mind/
 ## Architecture Principles
 
 ### Modularity
+
 - **Python**: one module per domain concern; no logic in `main.py` beyond app wiring
 - **CSS**: one stylesheet per component/feature (e.g., `nav.css`, `modal.css`)
 - **JS**: one module per concern (e.g., `api.js`, `renderer.js`, `formValidator.js`)
 - No monolithic files; entry-point files import only — they do not implement
 
 ### Separation of Concerns
+
 | Layer | Responsibility |
 |---|---|
 | `src/routes/` | HTTP request/response wiring only — delegates to `services/` |
@@ -58,6 +62,7 @@ Staff Mind/
 | `src/static/css/` | Presentation — no layout logic in HTML |
 
 ### Encapsulation
+
 - Each Python module exposes only what is necessary; internals are prefixed `_`
 - Each JS module exports only its public API; DOM access is confined to the owning module
 - No cross-module side effects; communicate via function calls or custom events
@@ -65,11 +70,13 @@ Staff Mind/
 - All configuration values are encapsulated in `src/config.py`; access them via explicit import, never via `os.environ` or inline literals
 
 ### Single Responsibility per Function
+
 - Every function does exactly one thing
 - If a function needs a second verb, split it
 - Target: ≤ 20 lines per function; flag and refactor if exceeded
 
 ### No Code Smells — Enforce Strictly
+
 - **No duplication**: extract any logic used more than once into a shared utility
 - **No long methods**: refactor if a function scrolls past one screen
 - **No large classes/modules**: split by responsibility; prefer composition
@@ -77,11 +84,13 @@ Staff Mind/
 ---
 
 ## Configuration
+
 - All environment variables are defined in `config/.env` (local only, git-ignored)
 - `config/.env.example` is the committed reference — one key per line, no values
 - `src/config.py` is the sole file that reads from `config/.env` via `python-dotenv`; all other modules import from `src/config.py`, never from `os.environ` directly
 
 **Every new config value follows this flow:**
+
 1. Add key to `config/.env` (with real value)
 2. Add key to `config/.env.example` (with empty value)
 3. Add typed constant to `src/config.py`
@@ -92,6 +101,7 @@ Staff Mind/
 ## Documentation Standards
 
 ### Python
+
 Every module, class, and function must have a docstring:
 
 ```python
@@ -115,6 +125,7 @@ def get_user_by_id(user_id: int) -> dict | None:
 ```
 
 ### JavaScript
+
 Every function and class must have a JSDoc block:
 
 ```js
@@ -134,6 +145,7 @@ function validateRequired(input) { ... }
 ```
 
 ### CSS
+
 Each file starts with a section header:
 
 ```css
@@ -144,6 +156,7 @@ Each file starts with a section header:
 ```
 
 ### HTML / Jinja2
+
 - Use semantic elements throughout
 - Comment non-obvious structural decisions inline
 - No inline `style=""` or `onclick=""` attributes
@@ -151,6 +164,7 @@ Each file starts with a section header:
 ---
 
 ## File Naming Conventions
+
 | Type | Convention | Example |
 |---|---|---|
 | Python modules | `snake_case.py` | `user_service.py` |
@@ -162,6 +176,7 @@ Each file starts with a section header:
 ---
 
 ## What Claude Must Not Do
+
 - Do not put business logic in route handlers — delegate to `services/`
 - Do not put Flask/HTTP imports in `services/` or `utils/`
 - Do not add styles to HTML files (`style=""` or `<style>` blocks)
@@ -182,26 +197,31 @@ Each file starts with a section header:
 ## Living Documents
 
 ### README.md
+
 Claude must keep `README.md` current after every change that affects it.
 
 **README.md must always contain these sections:**
+
 - **What it does** — one-paragraph description of the project's purpose
 - **Stack** — languages, frameworks, and dependencies with versions when known
 - **File structure** — directory tree with one-line description per entry
 - **How to run** — step-by-step local setup: install dependencies, environment variables, start command
 
 **Rules:**
+
 - Update README.md in the same response as the code change — never defer it
 - Do not summarize changes vaguely; be specific (e.g., "Added `auth_service.py`: handles login and token validation")
 - If a change makes an existing README section inaccurate, correct it immediately
 
 ### requirements.txt
+
 - Must be kept current at all times
 - Add a new library to `requirements.txt` immediately when it is imported anywhere in the codebase
 - Never import a library without first confirming it is listed in `requirements.txt`
 - Pin versions (e.g., `flask==3.1.0`) — no unpinned dependencies
 
 ### Tests
+
 - All tests live flat in `tests/`, one file per source module (e.g., `tests/test_user_service.py`)
 - Follow TDD: write the test first, then implement the function to pass it
 - Every new function in `services/` and `utils/` must have a corresponding test
@@ -210,6 +230,7 @@ Claude must keep `README.md` current after every change that affects it.
 ---
 
 ## Before Writing Any Code
+
 1. Identify which existing module owns this concern
 2. Check for existing utilities before writing new ones
 3. If a new module is needed, state its name, layer, and single responsibility before implementing
@@ -218,4 +239,5 @@ Claude must keep `README.md` current after every change that affects it.
 ---
 
 ## When in Doubt
+
 Ask. Do not assume, infer, or fill gaps silently.
