@@ -1,32 +1,31 @@
 /* ============================================================
-   tabs.css — Tab strip and tab-panel visibility toggling.
-   Does NOT style panel contents — see base.css for .panel.
+   tabs.css — Pill-shaped solver tab strip and tab-panel
+   visibility toggling. Sits in its own boxed bar (class="panel")
+   above the solver panels — see base.css for the shared .panel
+   chrome this reuses.
    ============================================================ */
 
 .tabs {
   display: flex;
   gap: 0.4rem;
-  margin: 0 -1.25rem -1px -1.25rem;
-  padding: 0 1.25rem;
-  order: -1;
+  padding: 0.5rem;
 }
 
 .tab {
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 8px 8px 0 0;
-  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  padding: 0.5rem 1.15rem;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
-.tab:hover:not(.active) { color: var(--text); border-color: transparent; }
+.tab:hover:not(.active) { background: var(--bg); color: var(--text); border-color: transparent; }
 
 .tab.active {
-  background: var(--panel);
-  border-color: var(--border);
-  border-bottom-color: var(--panel);
-  color: var(--text);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .tab-panel { display: none; }

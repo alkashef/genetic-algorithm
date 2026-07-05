@@ -13,3 +13,13 @@
 export function formatDistance(dist) {
   return Math.round(dist * 1000).toLocaleString();
 }
+
+/**
+ * Format a route as an arrow-joined sequence of city indices for display.
+ *
+ * @param {number[]} route - City indices, e.g. [0, 2, 1, 0].
+ * @returns {string} Arrow-joined sequence, e.g. "0 → 2 → 1 → 0".
+ */
+export function formatRoute(route) {
+  return route.join(" → ");
+}

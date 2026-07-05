@@ -10,7 +10,7 @@ import { streamBruteForce } from "./api.js";
 import { getCities } from "./cityState.js";
 import { clearCanvas, drawCities, drawRoute, drawGrid } from "./canvasUtils.js";
 import { emitBruteForceRunning, onCitiesChanged } from "./events.js";
-import { formatDistance } from "./format.js";
+import { formatDistance, formatRoute } from "./format.js";
 import { minCities } from "./uiConfig.js";
 
 const state = { running: false, abort: null, total: 0 };
@@ -28,6 +28,8 @@ export function initBruteForceView() {
   refs.currentVal = document.getElementById("bfCurrentVal");
   refs.currentDistVal = document.getElementById("bfCurrentDistVal");
   refs.bestVal = document.getElementById("bfBestVal");
+  refs.bestRouteVal = document.getElementById("bfBestRouteVal");
+  refs.progressFill = document.getElementById("bfProgressFill");
   refs.canvas = document.getElementById("setupCanvas");
   refs.ctx = refs.canvas.getContext("2d");
   refs.solveBtn.addEventListener("click", toggleSolve);
@@ -57,6 +59,8 @@ function reset() {
   refs.currentVal.textContent = "—";
   refs.currentDistVal.textContent = "—";
   refs.bestVal.textContent = "—";
+  refs.bestRouteVal.textContent = "—";
+  refs.progressFill.style.width = "0%";
   state.total = 0;
   redrawBoard();
 }
@@ -113,22 +117,36 @@ function makeCallbacks(cities) {
       refs.totalVal.textContent = total.toLocaleString();
     },
     onProgress: (route, dist, count) => {
-      refs.currentVal.textContent = `${count.toLocaleString()}/${state.total.toLocaleString()}`;
+      updateProgress(count);
       refs.currentDistVal.textContent = formatDistance(dist);
       redrawBoard();
       drawRoute(refs.ctx, refs.canvas, cities, route, { color: "#4f9dff", width: 1.5 });
     },
     onBest: (route, dist) => {
       refs.bestVal.textContent = formatDistance(dist);
+      refs.bestRouteVal.textContent = formatRoute(route);
       redrawBoard(route);
     },
     onDone: (route, dist, count) => {
       if (!route) return;
-      refs.currentVal.textContent = `${count.toLocaleString()}/${state.total.toLocaleString()}`;
+      updateProgress(count);
       refs.bestVal.textContent = formatDistance(dist);
+      refs.bestRouteVal.textContent = formatRoute(route);
       redrawBoard(route);
     },
   };
+}
+
+/**
+ * Refresh the route-count progress bar and its "count / total" label.
+ *
+ * @param {number} count - Routes explored so far.
+ * @returns {void}
+ */
+function updateProgress(count) {
+  refs.currentVal.textContent = `${count.toLocaleString()} / ${state.total.toLocaleString()} routes`;
+  const pct = state.total ? Math.min(100, (count / state.total) * 100) : 0;
+  refs.progressFill.style.width = `${pct}%`;
 }
 
 /**
@@ -142,5 +160,6 @@ function setRunning(running) {
   state.running = running;
   state.abort = running ? new AbortController() : null;
   refs.solveBtn.textContent = running ? "Stop" : "Solve";
+  refs.solveBtn.classList.toggle("btn-stop", running);
   emitBruteForceRunning(running);
 }

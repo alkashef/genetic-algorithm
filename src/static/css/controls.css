@@ -20,6 +20,12 @@
   gap: 0.2rem;
 }
 
+.controls label.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.55rem;
+}
+
 .controls input[type="number"] {
   width: 5.5rem;
 }

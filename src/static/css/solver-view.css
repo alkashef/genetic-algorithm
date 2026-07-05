@@ -1,51 +1,99 @@
 /* ============================================================
-   solver-view.css — Board + stat-card layout shared by the
-   brute-force and GA sections, and the GA fitness chart row.
+   solver-view.css — Headline result card, progress bar, and
+   secondary stat tiles shared by the brute-force and GA panels.
    Does NOT style the genome list — see genome-list.css.
    ============================================================ */
 
-.solver-view {
+.summary-card {
+  position: relative;
+  padding: 0.95rem 1.1rem 0.95rem 1.35rem;
+  border-radius: var(--radius-sm);
+  background: var(--good-soft);
+  box-shadow: inset 4px 0 0 var(--good);
   display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
   flex-wrap: wrap;
-  gap: 1.25rem;
-  align-items: flex-start;
 }
 
-.solver-view canvas {
-  flex: 2 1 360px;
-  min-width: 0;
-  height: auto;
-  max-width: 100%;
+.summary-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 700;
 }
 
-.solver-stats {
-  flex: 1 1 200px;
-  min-width: 180px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.summary-value {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.15;
 }
 
-.solver-stat {
-  background: var(--canvas-bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.7rem 0.85rem;
+.summary-caption {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
   color: var(--muted);
 }
 
-.solver-stat span { color: var(--accent); font-weight: 600; }
-
-#bfBestVal { color: var(--good); }
-
-.ga-chart-row {
-  margin-top: 1.25rem;
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.85rem 0 0.2rem;
 }
 
-.ga-chart-row canvas {
-  width: 100%;
-  height: auto;
-  max-width: 860px;
+.progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  width: 0%;
+}
+
+.progress-label {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.stat-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.stat-tile {
+  flex: 1 1 140px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.stat-tile .value {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
 }

@@ -1,20 +1,46 @@
 /* ============================================================
-   grid-info.css — Grid distance indicator below the canvas.
+   grid-info.css — Supplementary info below the Cities canvas:
+   the grid-spacing caption and the cities/paths mini-stats.
    ============================================================ */
 
-.grid-info {
-  margin-top: 0.75rem;
-  padding: 0.6rem 0.85rem;
-  background: var(--canvas-bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+.grid-caption {
+  margin-top: 0.5rem;
+  text-align: right;
   font-family: var(--font-mono);
-  font-size: 0.9rem;
-  color: var(--muted);
-  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  color: var(--border);
 }
 
-.grid-info span {
-  color: var(--accent);
-  font-weight: 600;
+.mini-stats {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.mini-stat {
+  flex: 1;
+  text-align: center;
+  padding: 0.85rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.mini-stat-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+.mini-stat-label {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
 }

@@ -1,23 +1,33 @@
 /* ============================================================
    base.css — Design tokens and page scaffold: root variables,
-   reset, body, header, main column, panels, buttons.
+   reset, dark app header, main column, panels, buttons.
    Does NOT include tab, control, or solver styles — see the
    other stylesheets in this directory.
    ============================================================ */
 
 :root {
-  --bg: #ffffff;
-  --panel: #f5f6fa;
-  --border: #d8dce6;
-  --text: #1a2235;
-  --muted: #667085;
-  --accent: #2563eb;
-  --accent-2: #e2692a;
-  --good: #1a9c53;
+  --bg: #eef1f6;
+  --panel: #ffffff;
+  --border: #dde3ec;
+  --text: #1a202c;
+  --muted: #66748a;
+  --accent: #3182ce;
+  --accent-strong: #2c5282;
+  --accent-soft: #e8f2fc;
+  --good: #2f855a;
+  --good-soft: #e7f6ee;
+  --danger: #c53030;
+  --danger-soft: #fdecea;
+  --crossover: rgba(49, 130, 206, 0.32);
+  --mutation: rgba(196, 100, 39, 0.55);
+  --header-bg: #1a202c;
+  --header-border: #2d3748;
+  --header-text: #ffffff;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
-  --canvas-bg: #ffffff;
   --input-bg: #ffffff;
+  --radius-sm: 6px;
+  --radius-md: 10px;
 }
 
 * { box-sizing: border-box; }
@@ -31,37 +41,45 @@ body {
 }
 
 header {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 0.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.7rem clamp(16px, 3vw, 40px);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  color: var(--header-text);
 }
 
-header h1 { margin: 0 0 0.25rem; font-size: 1.5rem; }
-.subtitle { color: var(--muted); margin: 0; }
+header h1 { margin: 0; font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em; }
+.subtitle { color: var(--header-text); font-size: 0.78rem; font-weight: 500; margin: 0; }
 
 main {
-  margin: 0 auto;
-  padding: 0 1.25rem 2rem;
+  margin: 0;
+  padding: 1.5rem clamp(16px, 3vw, 40px) 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 main.layout-two-column {
-  max-width: 1440px;
   flex-direction: row;
+  align-items: flex-start;
   gap: 1.5rem;
 }
 
 .left-column {
-  flex: 0 0 50%;
+  flex: 0 0 max(360px, 34%);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 .right-column {
-  flex: 0 0 50%;
+  flex: 1 1 0%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -70,31 +88,40 @@ main.layout-two-column {
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 1.25rem;
 }
 
-.panel h2 { margin-top: 0; font-size: 1.15rem; }
+.panel h2 { margin: 0 0 0.6rem; font-size: 1.1rem; font-weight: 700; }
 
-.hint { color: var(--muted); font-size: 0.85rem; margin-top: -0.5rem; }
+.hint { color: var(--muted); font-size: 0.82rem; margin: 0 0 0.85rem; }
 
 button {
-  background: #eceef4;
+  background: var(--panel);
   border: 1px solid var(--border);
   color: var(--text);
   padding: 0.5rem 0.9rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 button:hover:not(:disabled) { border-color: var(--accent); }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
 
+button.btn-stop {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+button.btn-stop:hover:not(:disabled) { background: var(--danger); color: #fff; }
+
 .stat { color: var(--muted); font-size: 0.85rem; margin-left: auto; }
 
 canvas {
-  background: var(--canvas-bg);
+  background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
   max-width: 100%;
@@ -108,7 +135,8 @@ canvas {
 
   .left-column,
   .right-column {
-    flex: 1;
+    flex: 1 1 auto;
+    width: 100%;
   }
 }
 

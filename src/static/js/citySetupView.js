@@ -7,7 +7,7 @@
  */
 
 import { emitCitiesChanged, onBruteForceRunning, onCitiesChanged } from "./events.js";
-import { getCities, setCities, clearCities, randomCities, buildDistanceMatrix } from "./cityState.js";
+import { getCities, setCities, clearCities, randomCities, buildDistanceMatrix, totalRoutes } from "./cityState.js";
 import { clearCanvas, drawCities, drawCompleteGraph, drawGrid, snapToGrid, getGridSpacingDistance } from "./canvasUtils.js";
 import { formatDistance } from "./format.js";
 
@@ -24,11 +24,14 @@ export function initCitySetupView() {
   refs.randomizeBtn = document.getElementById("randomizeBtn");
   refs.clearBtn = document.getElementById("clearBtn");
   refs.gridDistanceVal = document.getElementById("gridDistanceVal");
+  refs.citiesCountVal = document.getElementById("citiesCountVal");
+  refs.pathsCountVal = document.getElementById("pathsCountVal");
   refs.canvas = document.getElementById("setupCanvas");
   refs.ctx = refs.canvas.getContext("2d");
   refs.randomizeBtn.addEventListener("click", randomize);
   refs.clearBtn.addEventListener("click", clear);
   onCitiesChanged(redraw);
+  onCitiesChanged(updateCityStats);
   onBruteForceRunning(setBusy);
   updateGridDistance();
   randomize();
@@ -68,6 +71,17 @@ function clear() {
 function updateGridDistance() {
   const distance = getGridSpacingDistance();
   refs.gridDistanceVal.textContent = formatDistance(distance);
+}
+
+/**
+ * Update the cities/paths mini-stats shown below the grid caption.
+ *
+ * @returns {void}
+ */
+function updateCityStats() {
+  const count = getCities().length;
+  refs.citiesCountVal.textContent = count.toLocaleString();
+  refs.pathsCountVal.textContent = totalRoutes(count).toLocaleString();
 }
 
 /**

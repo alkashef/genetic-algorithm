@@ -27,7 +27,7 @@ and its fitness history — against the known optimum.
 │   ├── .env                       # Environment variables (local only, never committed)
 │   └── .env.example               # Committed template with all keys, no values
 ├── data/                          # Data files (currently empty)
-├── docs/                          # Project documentation (currently empty)
+├── docs/                          # Project documentation (ga_learning_guide.html)
 ├── src/
 │   ├── config.py                  # Sole reader of config/.env; exports typed constants
 │   ├── routes/

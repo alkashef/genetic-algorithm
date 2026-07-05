@@ -87,3 +87,17 @@ export function buildDistanceMatrix(cityList) {
   }
   return matrix;
 }
+
+/**
+ * Number of distinct brute-force routes for a city count (fixed start,
+ * mirror routes skipped) — mirrors count_routes() in bruteforce_service.py.
+ *
+ * @param {number} n - City count.
+ * @returns {number} (n-1)!/2 for n > 2, else 1.
+ */
+export function totalRoutes(n) {
+  if (n <= 2) return 1;
+  let result = 1;
+  for (let i = 2; i <= n - 1; i++) result *= i;
+  return result / 2;
+}
