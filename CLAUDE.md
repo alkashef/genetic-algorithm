@@ -17,7 +17,7 @@ Claude assists as a coding partner with strict adherence to the principles below
 
 ## Project Structure (Canonical)
 
-```
+```text
 Staff Mind/
 ├── config/
 │   ├── .env                    # Environment variables (never committed)
@@ -53,7 +53,7 @@ Staff Mind/
 ### Separation of Concerns
 
 | Layer | Responsibility |
-|---|---|
+| --- | --- |
 | `src/routes/` | HTTP request/response wiring only — delegates to `services/` |
 | `src/services/` | Business logic — no Flask, no HTTP concepts |
 | `src/models/` | Data structure definitions only |
@@ -166,7 +166,7 @@ Each file starts with a section header:
 ## File Naming Conventions
 
 | Type | Convention | Example |
-|---|---|---|
+| --- | --- | --- |
 | Python modules | `snake_case.py` | `user_service.py` |
 | Flask blueprints | `snake_case.py` | `auth_routes.py` |
 | JS modules | `camelCase.js` | `formValidator.js` |

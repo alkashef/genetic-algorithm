@@ -21,7 +21,7 @@ and its fitness history — against the known optimum.
 
 ## File structure
 
-```
+```text
 .
 ├── config/
 │   ├── .env                       # Environment variables (local only, never committed)
