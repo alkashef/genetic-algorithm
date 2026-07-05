@@ -4,9 +4,15 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TSP Genetic Algorithm Visualizer</title>
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tabs.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/controls.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/solver-view.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/genome-list.css') }}" />
 </head>
-<body>
+<!-- UI configuration flows from config/.env via src/config.py into these
+     data attributes; JS modules read them through js/uiConfig.js. -->
+<body data-genome-render-cap="{{ genome_render_cap }}" data-min-cities="{{ min_cities }}">
 <header>
   <h1>Traveling Salesman Problem &mdash; GA Visualizer</h1>
   <p class="subtitle">Place cities, find the exact optimum by brute force, then watch a classic genetic algorithm evolve toward it.</p>
@@ -41,16 +47,16 @@
     <div class="controls">
       <button id="bfSolveBtn">Solve</button>
       <label>Step delay (seconds)
-        <input type="number" id="bfStepDelay" min="0" max="60" step="0.1" value="3" />
+        <input type="number" id="bfStepDelay" min="0" max="60" step="0.1" value="{{ default_step_delay }}" />
       </label>
     </div>
-    <div class="bf-view">
+    <div class="solver-view">
       <canvas id="bfCanvas" width="640" height="420"></canvas>
-      <div class="bf-stats">
-        <div class="bf-stat">Total number of routes = <span id="bfTotalVal">&mdash;</span></div>
-        <div class="bf-stat">Current route = <span id="bfCurrentVal">&mdash;</span></div>
-        <div class="bf-stat">Current route distance = <span id="bfCurrentDistVal">&mdash;</span></div>
-        <div class="bf-stat">Best Distance = <span id="bfBestVal">&mdash;</span></div>
+      <div class="solver-stats">
+        <div class="solver-stat">Total number of routes = <span id="bfTotalVal">&mdash;</span></div>
+        <div class="solver-stat">Current route = <span id="bfCurrentVal">&mdash;</span></div>
+        <div class="solver-stat">Current route distance = <span id="bfCurrentDistVal">&mdash;</span></div>
+        <div class="solver-stat">Best Distance = <span id="bfBestVal">&mdash;</span></div>
       </div>
     </div>
   </section>
@@ -88,12 +94,12 @@
       <button id="gaResetBtn">Reset</button>
     </div>
     <p class="hint">Step through one phase at a time, or Fast forward to run automatically (paced by the step delay below).</p>
-    <div class="bf-view">
+    <div class="solver-view">
       <canvas id="gaCanvas" width="420" height="420"></canvas>
-      <div class="bf-stats">
-        <div class="bf-stat">Generation = <span id="gaGenVal">0</span></div>
-        <div class="bf-stat">Best distance = <span id="gaBestVal">&mdash;</span></div>
-        <div class="bf-stat">Average distance = <span id="gaAvgVal">&mdash;</span></div>
+      <div class="solver-stats">
+        <div class="solver-stat">Generation = <span id="gaGenVal">0</span></div>
+        <div class="solver-stat">Best distance = <span id="gaBestVal">&mdash;</span></div>
+        <div class="solver-stat">Average distance = <span id="gaAvgVal">&mdash;</span></div>
       </div>
     </div>
     <div class="ga-chart-row">
@@ -104,10 +110,10 @@
     <div class="ga-genomes">
       <div class="genome-list" id="gaGenomeList"></div>
       <div class="genome-info">
-        <div class="bf-stat">Generation = <span id="gaGenomeGen">0</span></div>
-        <div class="bf-stat">Population = <span id="gaGenomePop">0</span></div>
+        <div class="solver-stat">Generation = <span id="gaGenomeGen">0</span></div>
+        <div class="solver-stat">Population = <span id="gaGenomePop">0</span></div>
         <label>Step delay (seconds)
-          <input type="number" id="gaStepDelay" min="0" max="60" step="0.1" value="0.5" />
+          <input type="number" id="gaStepDelay" min="0" max="60" step="0.1" value="{{ default_step_delay }}" />
         </label>
         <div class="genome-legend">
           <span><span class="swatch crossover"></span> crossover segment</span>
@@ -119,10 +125,7 @@
 
 </main>
 
-<footer>
-  <p>Vanilla HTML / CSS / JS &mdash; no frameworks, no build step.</p>
-</footer>
-
-<script type="module" src="js/main.js"></script>
+<!-- Root entry point: the only script tag, per project conventions. -->
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

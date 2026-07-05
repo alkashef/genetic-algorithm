@@ -1,0 +1,51 @@
+/* ============================================================
+   solver-view.css — Board + stat-card layout shared by the
+   brute-force and GA sections, and the GA fitness chart row.
+   Does NOT style the genome list — see genome-list.css.
+   ============================================================ */
+
+.solver-view {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.solver-view canvas {
+  flex: 2 1 360px;
+  min-width: 0;
+  height: auto;
+  max-width: 100%;
+}
+
+.solver-stats {
+  flex: 1 1 200px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+.solver-stat {
+  background: var(--canvas-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.7rem 0.85rem;
+  color: var(--muted);
+}
+
+.solver-stat span { color: var(--accent); font-weight: 600; }
+
+#bfBestVal { color: var(--good); }
+
+.ga-chart-row {
+  margin-top: 1.25rem;
+}
+
+.ga-chart-row canvas {
+  width: 100%;
+  height: auto;
+  max-width: 860px;
+}

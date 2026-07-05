@@ -1,0 +1,33 @@
+/* ============================================================
+   tabs.css — Tab strip and tab-panel visibility toggling.
+   Does NOT style panel contents — see base.css for .panel.
+   ============================================================ */
+
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  max-width: 960px;
+  margin: 1.25rem auto -1px;
+  padding: 0 1.25rem;
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px 8px 0 0;
+  padding: 0.55rem 1.1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.tab:hover:not(.active) { color: var(--text); border-color: transparent; }
+
+.tab.active {
+  background: var(--panel);
+  border-color: var(--border);
+  border-bottom-color: var(--panel);
+  color: var(--text);
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }

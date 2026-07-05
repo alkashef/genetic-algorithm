@@ -1,130 +1,118 @@
 # TSP Genetic Algorithm Visualizer
 
-An interactive web-based visualizer for the Traveling Salesman Problem (TSP) that demonstrates and compares two solution approaches: brute-force optimization and genetic algorithms.
+## What it does
 
-## Overview
+An interactive web application that solves the Traveling Salesman Problem (TSP)
+two ways and visualizes both: exhaustive brute-force search finds the exact
+optimum, while a classic genetic algorithm evolves toward it generation by
+generation. You place or randomize cities on a canvas, watch every candidate
+route as brute force enumerates them, then step the GA through each evolution
+phase (fitness → selection → crossover → mutation) and compare its best tour —
+and its fitness history — against the known optimum.
 
-This single-page application lets you:
-1. **Place cities** on a canvas manually or generate random configurations
-2. **Find the optimal solution** using brute-force enumeration
-3. **Watch a genetic algorithm evolve** toward the optimal path in real-time
+## Stack
 
-See how a classic genetic algorithm gradually improves its solution while remaining computationally tractable, contrasted with the exponential cost of exhaustive search.
+- **Backend**: Python 3 (developed on 3.14), Flask 3.1.3, python-dotenv 1.2.2
+- **Frontend**: semantic HTML (Jinja2 template), modular CSS, JavaScript ES6+ modules
+- **Template engine**: Jinja2 (Flask default)
+- **Tests**: Python standard-library `unittest`
+- No JavaScript dependencies and no build step
 
-## Features
-
-### City Setup
-- **Manual placement**: Toggle "Click to Add" mode to place cities anywhere on the canvas
-- **Random generation**: Automatically create a specified number of cities
-- **Clear**: Reset all cities and recompute from scratch
-- Support for up to 200 cities
-
-### Brute Force (Exact Optimum)
-- Exhaustive enumeration of all possible routes
-- Finds the mathematically optimal solution
-- Real-time progress display: current route, distance, and best found
-- Visualizes the optimal route in green
-- **Warning**: Route count grows factorially—even 13 cities means 6.2 million routes to check
-
-### Genetic Algorithm
-- **Configurable parameters**:
-  - Population size (4–2000)
-  - Max generations (1–100,000)
-  - Crossover rate (0–1)
-  - Mutation rate (0–1)
-  - Selection method: Tournament (default) or Roulette Wheel
-  - Tournament size (when using tournament selection)
-  - Elitism (preserve best candidate each generation)
-  - Speed control (0–500ms per generation)
-
-- **Algorithm features**:
-  - Permutation encoding (each individual is a city tour)
-  - Order Crossover (OX) for breeding
-  - Swap mutation for exploration
-  - Live fitness tracking: best and average distance per generation
-  - Real-time visualization of the best tour found and fitness history chart
-
-- **Controls**:
-  - **Start**: Run the algorithm until max generations
-  - **Pause**: Pause mid-evolution and resume later
-  - **Step**: Advance one generation at a time for detailed inspection
-  - **Reset**: Clear all progress and start fresh
-
-## Quick Start
-
-⚠️ **Important**: This app uses ES6 modules and **must be served over HTTP**. Do not open `index.html` directly as a file (`file://` URLs will fail).
-
-Start a local web server from the project directory, then open the app in your browser.
-
-**Option 1: Python** (most systems have this)
-```bash
-python -m http.server 8000
-# Then open http://localhost:8000 in your browser
-```
-
-**Option 2: Node.js**
-```bash
-npx http-server -p 8000
-# Then open http://localhost:8000 in your browser
-```
-
-## How to Use
-
-1. After starting the server, open **http://localhost:8000** in your browser
-2. **Configure cities** using the City section:
-   - Click "Randomize" to auto-generate cities, or
-   - Toggle "Click to Add" and click the canvas to manually place cities
-3. **Run brute force** to find the optimal solution (works best for 3–12 cities)
-4. **Adjust GA parameters** to your preference (population, generations, mutation rate, etc.)
-5. **Start the genetic algorithm** and watch it evolve toward the optimum
-6. **Compare**: View the GA's best solution against the brute-force result
-
-## Project Structure
+## File structure
 
 ```
 .
-├── index.html          # Single HTML page
-├── style.css          # Layout and styling
-├── js/
-│   ├── main.js        # UI event handlers and orchestration
-│   ├── state.js       # City and distance matrix state
-│   ├── ga.js          # Genetic algorithm implementation
-│   ├── bruteforce.js  # Brute-force solver
-│   ├── canvasUtils.js # Canvas drawing utilities
-│   └── chart.js       # Fitness history chart
-└── README.md          # This file
+├── config/
+│   ├── .env                       # Environment variables (local only, never committed)
+│   └── .env.example               # Committed template with all keys, no values
+├── data/                          # Data files (currently empty)
+├── docs/                          # Project documentation (currently empty)
+├── src/
+│   ├── config.py                  # Sole reader of config/.env; exports typed constants
+│   ├── routes/
+│   │   ├── page_routes.py         # Serves the single page, injects UI config
+│   │   ├── ga_routes.py           # /api/ga/* — one endpoint per evolution stage
+│   │   └── bruteforce_routes.py   # /api/bruteforce — NDJSON event stream
+│   ├── services/
+│   │   ├── ga_service.py          # GA logic: OX crossover, swap mutation, selection
+│   │   └── bruteforce_service.py  # Heap's-algorithm enumeration as an event generator
+│   ├── models/
+│   │   └── ga_params.py           # SelectionParams dataclass
+│   ├── utils/
+│   │   └── tsp_math.py            # Pure geometry: distance matrix, route/tour length
+│   ├── static/
+│   │   ├── css/                   # One stylesheet per component (base, tabs, controls, …)
+│   │   ├── js/                    # One module per concern (api, views, chart, events, …)
+│   │   └── assets/                # Images, fonts, icons (currently empty)
+│   └── templates/
+│       └── index.html             # Jinja2 single-page shell
+├── tests/                         # Mirrors src/ (models, services, utils)
+├── main.py                        # App entry point — wiring only
+└── requirements.txt               # Pinned Python dependencies
 ```
 
-## Technical Details
+## How to run
 
-### Genetic Algorithm
-- **Encoding**: Permutation (tour order)
-- **Selection**: Tournament selection (configurable) or fitness-proportionate (roulette wheel)
-- **Crossover**: Order Crossover (OX)—preserves relative city order
-- **Mutation**: Swap mutation—exchanges two random cities
-- **Fitness**: Inverse distance (minimize total tour distance)
+Requires Python 3 and pip. From the project root:
 
-### Brute Force
-- Generates permutations of city indices with the first city fixed (reduces by factor of n)
-- Mirrors skipped (clockwise ≈ counterclockwise; reduces by factor of 2)
-- Total permutations checked: **(n−1)! / 2**
+```bash
+# 1. Install pinned dependencies
+pip install -r requirements.txt
 
-## Browser Requirements
+# 2. (Optional) Configure — defaults work out of the box
+#    Copy config/.env.example to config/.env and fill in values to override
+#    host, port, debug mode, or solver tuning knobs.
 
-- Modern browser with ES modules support
-- Canvas API
-- No external dependencies or build tools
+# 3. Start the server (serves both the API and the frontend)
+python main.py
 
-## Tips & Tricks
+# 4. Open http://localhost:8000 in a modern browser
+```
 
-- **Small problems (3–12 cities)**: Run brute force to find the global optimum, then compare with GA results
-- **Larger problems (13+ cities)**: Use GA only (brute force will be very slow)
-- **Tuning**: Start with default parameters, then try:
-  - Higher mutation rates for more exploration
-  - Higher crossover rates to leverage good solutions
-  - Smaller tournament sizes (3–5) for more diverse population
-  - Elitism enabled to avoid losing the best solution
+The app must be served by Flask — opening the template as a file will not work
+(ES modules and backend calls both require HTTP).
 
-## Author
+## API
 
-Created as a single-page educational tool to visualize evolutionary computation and combinatorial optimization.
+The frontend holds the population between steps and calls one endpoint per
+evolution stage:
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /api/ga/init` | Build the initial random population |
+| `POST /api/ga/evaluate` | Compute each tour's distance (fitness) |
+| `POST /api/ga/select` | Pick parent pairs (tournament / roulette) + elite |
+| `POST /api/ga/crossover` | Order Crossover (OX) breeding, with per-genome trace |
+| `POST /api/ga/mutate` | Swap mutation, with per-genome trace |
+| `POST /api/bruteforce` | Stream every route + running best (NDJSON); client abort cancels |
+
+## Technical details
+
+**Genetic algorithm** — permutation encoding; tournament (configurable size) or
+roulette-wheel selection; Order Crossover (OX), which preserves relative city
+order; swap mutation; optional elitism. Fitness is the closed-tour distance
+(minimized).
+
+**Brute force** — enumerates permutations via Heap's algorithm with the first
+city fixed and mirror-image routes skipped, exploring exactly **(n−1)!/2**
+distinct routes. Progress streams to the browser as newline-delimited JSON;
+stopping the run aborts the request and the server halts enumeration.
+
+## Tests
+
+```bash
+python -m unittest discover -s tests -t . -v
+```
+
+Covers the geometry utilities, every GA stage (permutation validity, elitism,
+selection strategies, rate edge cases), the SelectionParams model, and the
+brute-force solver — including a check against an independent exhaustive
+search that it finds the true optimum.
+
+## Tips
+
+- **3–12 cities**: run brute force for the global optimum, then compare the GA
+- **13+ cities**: use the GA only (brute force grows factorially)
+- Tuning: higher mutation for exploration, higher crossover to exploit good
+  solutions, smaller tournaments (3–5) for diversity, elitism on to never lose
+  the best tour

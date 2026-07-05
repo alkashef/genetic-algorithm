@@ -1,0 +1,9 @@
+# Environment variables — never commit real values
+config/.env
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Test / tooling caches
+.pytest_cache/

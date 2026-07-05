@@ -1,0 +1,111 @@
+/* ============================================================
+   genome-list.css — GA population genome rows, gene cells,
+   crossover/mutation highlights, legend, and side info column.
+   Does NOT style the stat cards it sits beside — see
+   solver-view.css.
+   ============================================================ */
+
+.ga-genomes-title {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1rem;
+}
+
+.ga-genomes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.genome-list {
+  flex: 2 1 420px;
+  min-width: 0;
+  max-height: 380px;
+  overflow: auto;
+  background: var(--canvas-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.genome {
+  display: flex;
+  gap: 2px;
+  padding: 1px 2px;
+  white-space: nowrap;
+}
+
+.genome.elite {
+  box-shadow: inset 3px 0 0 var(--good);
+}
+
+.genome.selected {
+  background: rgba(79, 217, 132, 0.14);
+  border-radius: 3px;
+}
+
+.gene {
+  display: inline-block;
+  min-width: 1.5rem;
+  text-align: center;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.gene.crossover { background: rgba(79, 157, 255, 0.45); color: var(--text); }
+.gene.mutation { background: rgba(255, 138, 79, 0.8); color: var(--text); }
+
+.genome-more {
+  color: var(--muted);
+  padding: 0.4rem 2px;
+}
+
+.genome-info {
+  flex: 1 1 200px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.genome-info label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+  color: var(--muted);
+  gap: 0.2rem;
+}
+
+.genome-info input[type="number"] {
+  width: 6rem;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0.35rem 0.4rem;
+  font-size: 0.9rem;
+}
+
+.genome-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.genome-legend .swatch {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-right: 0.3rem;
+}
+
+.genome-legend .swatch.crossover { background: rgba(79, 157, 255, 0.45); }
+.genome-legend .swatch.mutation { background: rgba(255, 138, 79, 0.8); }

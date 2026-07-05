@@ -1,0 +1,24 @@
+{
+  "python.defaultInterpreterPath": "C:\\Users\\aa186095\\AppData\\Local\\miniconda3\\envs\\ga\\python.exe",
+  "terminal.integrated.defaultProfile.windows": "Command Prompt (Conda)",
+  "terminal.integrated.profiles.windows": {
+    "Command Prompt (Conda)": {
+      "path": "C:\\Windows\\System32\\cmd.exe",
+      "args": [
+        "/K",
+        "C:\\Users\\aa186095\\AppData\\Local\\miniconda3\\Scripts\\activate.bat ga"
+      ]
+    }
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:conda",
+  "python-envs.defaultPackageManager": "ms-python.python:conda",
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s",
+    "./tests",
+    "-p",
+    "test_*.py"
+  ],
+  "python.testing.pytestEnabled": false,
+  "python.testing.unittestEnabled": true
+}
