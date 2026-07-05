@@ -18,6 +18,7 @@
   --good-soft: #e7f6ee;
   --danger: #c53030;
   --danger-soft: #fdecea;
+  --tour-best: #4fd984; /* matches the best-tour line color drawn on the canvas (canvasUtils.js callers) */
   --crossover: rgba(49, 130, 206, 0.32);
   --mutation: rgba(196, 100, 39, 0.55);
   --header-bg: #1a202c;
@@ -82,7 +83,7 @@ main.layout-two-column {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0;
 }
 
 .panel {

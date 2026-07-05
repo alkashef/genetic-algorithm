@@ -26,6 +26,7 @@ export function initBruteForceView() {
   refs.stepDelayInput = document.getElementById("bfStepDelay");
   refs.totalVal = document.getElementById("bfTotalVal");
   refs.currentVal = document.getElementById("bfCurrentVal");
+  refs.currentRouteVal = document.getElementById("bfCurrentRouteVal");
   refs.currentDistVal = document.getElementById("bfCurrentDistVal");
   refs.bestVal = document.getElementById("bfBestVal");
   refs.bestRouteVal = document.getElementById("bfBestRouteVal");
@@ -55,8 +56,9 @@ function toggleSolve() {
  * @returns {void}
  */
 function reset() {
-  refs.totalVal.textContent = "—";
+  refs.totalVal.textContent = "";
   refs.currentVal.textContent = "—";
+  refs.currentRouteVal.textContent = "—";
   refs.currentDistVal.textContent = "—";
   refs.bestVal.textContent = "—";
   refs.bestRouteVal.textContent = "—";
@@ -114,10 +116,10 @@ function makeCallbacks(cities) {
   return {
     onTotal: (total) => {
       state.total = total;
-      refs.totalVal.textContent = total.toLocaleString();
     },
     onProgress: (route, dist, count) => {
       updateProgress(count);
+      refs.currentRouteVal.textContent = formatRoute(route);
       refs.currentDistVal.textContent = formatDistance(dist);
       redrawBoard();
       drawRoute(refs.ctx, refs.canvas, cities, route, { color: "#4f9dff", width: 1.5 });

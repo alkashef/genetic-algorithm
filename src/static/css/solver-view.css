@@ -1,8 +1,76 @@
 /* ============================================================
-   solver-view.css — Headline result card, progress bar, and
-   secondary stat tiles shared by the brute-force and GA panels.
+   solver-view.css — Bordered/titled subsections, headline result
+   card, progress bar, mini-stat boxes, and the status text line,
+   shared across the Cities, brute-force, and GA panels.
    Does NOT style the genome list — see genome-list.css.
    ============================================================ */
+
+.subsection {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.subsection-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.status-line {
+  margin: 0.6rem 0 0;
+  min-height: 1em;
+  font-size: 0.8rem;
+  color: var(--danger);
+}
+
+.mini-stats {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.mini-stat {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  padding: 0.85rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.mini-stat-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+.mini-stat-value.route-value {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.mini-stat-value.best-value {
+  color: var(--tour-best);
+}
+
+.mini-stat-label {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
 
 .summary-card {
   position: relative;
@@ -71,29 +139,3 @@
   white-space: nowrap;
 }
 
-.stat-tiles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 0.9rem;
-}
-
-.stat-tile {
-  flex: 1 1 140px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.6rem 0.8rem;
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
-.stat-tile .value {
-  display: block;
-  margin-top: 0.15rem;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text);
-}

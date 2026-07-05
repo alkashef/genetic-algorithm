@@ -1,20 +1,26 @@
 /* ============================================================
-   tabs.css — Pill-shaped solver tab strip and tab-panel
-   visibility toggling. Sits in its own boxed bar (class="panel")
-   above the solver panels — see base.css for the shared .panel
+   tabs.css — Folder-style solver tab strip and tab-panel
+   visibility toggling. Tabs sit flush along the bottom of their
+   strip, rounded on top and square on the bottom, directly on
+   top of the solver panels (class="panel") so the two read as
+   one continuous card — see base.css for the shared .panel
    chrome this reuses.
    ============================================================ */
 
 .tabs {
   display: flex;
+  align-items: flex-end;
   gap: 0.4rem;
-  padding: 0.5rem;
+  padding: 0.5rem 0.5rem 0;
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .tab {
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   padding: 0.5rem 1.15rem;
   color: var(--muted);
   font-size: 0.9rem;
@@ -28,5 +34,9 @@
   color: #fff;
 }
 
-.tab-panel { display: none; }
+.tab-panel {
+  display: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
 .tab-panel.active { display: block; }

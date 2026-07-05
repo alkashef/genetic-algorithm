@@ -1,7 +1,8 @@
 /* ============================================================
    controls.css — Parameter control rows: labeled inputs,
-   selects, and checkboxes above each solver board.
-   Does NOT style buttons — see base.css.
+   selects, and checkboxes above each solver board, plus the
+   right-aligned button group each row ends with.
+   Does NOT style the buttons themselves — see base.css.
    ============================================================ */
 
 .controls {
@@ -24,6 +25,8 @@
   flex-direction: row;
   align-items: center;
   gap: 0.55rem;
+  font-size: 0.9rem;
+  font-weight: 400;
 }
 
 .controls input[type="number"] {
@@ -40,3 +43,9 @@
 }
 
 .controls input[type="checkbox"] { width: auto; }
+
+.controls-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-left: auto;
+}
