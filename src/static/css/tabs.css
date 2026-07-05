@@ -6,9 +6,9 @@
 .tabs {
   display: flex;
   gap: 0.4rem;
-  max-width: 960px;
-  margin: 1.25rem auto -1px;
+  margin: 0 -1.25rem -1px -1.25rem;
   padding: 0 1.25rem;
+  order: -1;
 }
 
 .tab {

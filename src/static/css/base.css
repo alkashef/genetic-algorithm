@@ -31,7 +31,7 @@ body {
 }
 
 header {
-  max-width: 960px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 1.5rem 1.25rem 0.5rem;
 }
@@ -40,9 +40,28 @@ header h1 { margin: 0 0 0.25rem; font-size: 1.5rem; }
 .subtitle { color: var(--muted); margin: 0; }
 
 main {
-  max-width: 960px;
   margin: 0 auto;
   padding: 0 1.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+main.layout-two-column {
+  max-width: 1440px;
+  flex-direction: row;
+  gap: 1.5rem;
+}
+
+.left-column {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.right-column {
+  flex: 0 0 50%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -80,6 +99,17 @@ canvas {
   border-radius: 8px;
   max-width: 100%;
   display: block;
+}
+
+@media (max-width: 1024px) {
+  main.layout-two-column {
+    flex-direction: column;
+  }
+
+  .left-column,
+  .right-column {
+    flex: 1;
+  }
 }
 
 @media (max-width: 640px) {

@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/controls.css') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/solver-view.css') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/genome-list.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/grid-info.css') }}" />
 </head>
 <!-- UI configuration flows from config/.env via src/config.py into these
      data attributes; JS modules read them through js/uiConfig.js. -->
@@ -18,109 +19,107 @@
   <p class="subtitle">Place cities, find the exact optimum by brute force, then watch a classic genetic algorithm evolve toward it.</p>
 </header>
 
-<nav class="tabs" role="tablist">
-  <button class="tab active" data-tab="setup">Cities</button>
-  <button class="tab" data-tab="bruteforce">Brute Force</button>
-  <button class="tab" data-tab="ga">Genetic Algorithm</button>
-</nav>
+<main class="layout-two-column">
 
-<main>
+  <!-- ============ LEFT COLUMN: CITIES ============ -->
+  <aside class="left-column">
+    <section class="panel">
+      <h2>1. Cities</h2>
+      <div class="controls">
+        <label>Number of cities
+          <input type="number" id="cityCount" min="2" max="200" value="6" />
+        </label>
+        <button id="randomizeBtn">Randomize</button>
+        <button id="clearBtn">Clear</button>
+      </div>
+      <canvas id="setupCanvas" width="640" height="420"></canvas>
+      <div class="grid-info">
+        Grid spacing: <span id="gridDistanceVal">0.1</span>
+      </div>
+    </section>
+  </aside>
 
-  <!-- ============ 1. CITY SETUP ============ -->
-  <section id="setup" class="panel tab-panel active">
-    <h2>1. Cities</h2>
-    <div class="controls">
-      <label>Number of cities
-        <input type="number" id="cityCount" min="2" max="200" value="6" />
-      </label>
-      <button id="randomizeBtn">Randomize</button>
-      <button id="clearBtn">Clear</button>
-      <span class="stat">Cities: <span id="cityCounter">0</span></span>
-    </div>
-    <canvas id="setupCanvas" width="640" height="420"></canvas>
-  </section>
+  <!-- ============ RIGHT COLUMN: TABS + SOLVERS ============ -->
+  <section class="right-column">
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="bruteforce">Brute Force</button>
+      <button class="tab" data-tab="ga">Genetic Algorithm</button>
+    </nav>
 
-  <!-- ============ 2. BRUTE FORCE ============ -->
-  <section id="bruteforce" class="panel tab-panel">
-    <h2>2. Brute Force (Exact Optimum)</h2>
-    <p class="hint">Enumerates every route (start city fixed, mirror routes skipped). Route count grows factorially &mdash; large city counts can take a long time.</p>
-    <div class="controls">
-      <button id="bfSolveBtn">Solve</button>
-      <label>Step delay (seconds)
-        <input type="number" id="bfStepDelay" min="0" max="60" step="0.1" value="{{ default_step_delay }}" />
-      </label>
-    </div>
-    <div class="solver-view">
-      <canvas id="bfCanvas" width="640" height="420"></canvas>
+    <!-- ============ 2. BRUTE FORCE ============ -->
+    <section id="bruteforce" class="panel tab-panel active">
+      <h2>2. Brute Force (Exact Optimum)</h2>
+      <p class="hint">Enumerates every route (start city fixed, mirror routes skipped). Route count grows factorially &mdash; large city counts can take a long time.</p>
+      <div class="controls">
+        <button id="bfSolveBtn">Solve</button>
+        <label>Step delay (seconds)
+          <input type="number" id="bfStepDelay" min="0" max="60" step="0.1" value="{{ default_step_delay }}" />
+        </label>
+      </div>
       <div class="solver-stats">
         <div class="solver-stat">Total number of routes = <span id="bfTotalVal">&mdash;</span></div>
         <div class="solver-stat">Current route = <span id="bfCurrentVal">&mdash;</span></div>
         <div class="solver-stat">Current route distance = <span id="bfCurrentDistVal">&mdash;</span></div>
         <div class="solver-stat">Best Distance = <span id="bfBestVal">&mdash;</span></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ============ 3. GENETIC ALGORITHM ============ -->
-  <section id="ga" class="panel tab-panel">
-    <h2>3. Genetic Algorithm</h2>
-    <div class="controls ga-params">
-      <label>Population
-        <input type="number" id="gaPopSize" min="4" max="2000" value="120" />
-      </label>
-      <label>Max generations
-        <input type="number" id="gaMaxGen" min="1" max="100000" value="400" />
-      </label>
-      <label>Crossover rate
-        <input type="number" id="gaCrossoverRate" min="0" max="1" step="0.05" value="0.9" />
-      </label>
-      <label>Mutation rate
-        <input type="number" id="gaMutationRate" min="0" max="1" step="0.01" value="0.02" />
-      </label>
-      <label>Selection
-        <select id="gaSelection">
-          <option value="tournament" selected>Tournament</option>
-          <option value="roulette">Roulette Wheel</option>
-        </select>
-      </label>
-      <label id="gaTournamentSizeWrap">Tournament size
-        <input type="number" id="gaTournamentSize" min="2" max="50" value="5" />
-      </label>
-      <label><input type="checkbox" id="gaElitism" checked /> Elitism</label>
-    </div>
-    <div class="controls">
-      <button id="gaStepBtn">Initialize</button>
-      <button id="gaFastBtn">Fast forward</button>
-      <button id="gaResetBtn">Reset</button>
-    </div>
-    <p class="hint">Step through one phase at a time, or Fast forward to run automatically (paced by the step delay below).</p>
-    <div class="solver-view">
-      <canvas id="gaCanvas" width="420" height="420"></canvas>
+    <!-- ============ 3. GENETIC ALGORITHM ============ -->
+    <section id="ga" class="panel tab-panel">
+      <h2>3. Genetic Algorithm</h2>
+      <div class="controls ga-params">
+        <label>Population
+          <input type="number" id="gaPopSize" min="4" max="2000" value="120" />
+        </label>
+        <label>Max generations
+          <input type="number" id="gaMaxGen" min="1" max="100000" value="400" />
+        </label>
+        <label>Crossover rate
+          <input type="number" id="gaCrossoverRate" min="0" max="1" step="0.05" value="0.9" />
+        </label>
+        <label>Mutation rate
+          <input type="number" id="gaMutationRate" min="0" max="1" step="0.01" value="0.02" />
+        </label>
+        <label>Selection
+          <select id="gaSelection">
+            <option value="tournament" selected>Tournament</option>
+            <option value="roulette">Roulette Wheel</option>
+          </select>
+        </label>
+        <label id="gaTournamentSizeWrap">Tournament size
+          <input type="number" id="gaTournamentSize" min="2" max="50" value="5" />
+        </label>
+        <label><input type="checkbox" id="gaElitism" checked /> Elitism</label>
+      </div>
+      <div class="controls">
+        <button id="gaStepBtn">Initialize</button>
+        <button id="gaFastBtn">Fast forward</button>
+        <button id="gaResetBtn">Reset</button>
+      </div>
+      <p class="hint">Step through one phase at a time, or Fast forward to run automatically (paced by the step delay below).</p>
       <div class="solver-stats">
         <div class="solver-stat">Generation = <span id="gaGenVal">0</span></div>
         <div class="solver-stat">Best distance = <span id="gaBestVal">&mdash;</span></div>
         <div class="solver-stat">Average distance = <span id="gaAvgVal">&mdash;</span></div>
       </div>
-    </div>
-    <div class="ga-chart-row">
-      <canvas id="gaChart" width="860" height="360"></canvas>
-    </div>
 
-    <h3 class="ga-genomes-title">Population genomes</h3>
-    <div class="ga-genomes">
-      <div class="genome-list" id="gaGenomeList"></div>
-      <div class="genome-info">
-        <div class="solver-stat">Generation = <span id="gaGenomeGen">0</span></div>
-        <div class="solver-stat">Population = <span id="gaGenomePop">0</span></div>
-        <label>Step delay (seconds)
-          <input type="number" id="gaStepDelay" min="0" max="60" step="0.1" value="{{ default_step_delay }}" />
-        </label>
-        <div class="genome-legend">
-          <span><span class="swatch crossover"></span> crossover segment</span>
-          <span><span class="swatch mutation"></span> mutation swap</span>
+      <h3 class="ga-genomes-title">Population genomes</h3>
+      <div class="ga-genomes">
+        <div class="genome-list" id="gaGenomeList"></div>
+        <div class="genome-info">
+          <div class="solver-stat">Generation = <span id="gaGenomeGen">0</span></div>
+          <div class="solver-stat">Population = <span id="gaGenomePop">0</span></div>
+          <label>Step delay (seconds)
+            <input type="number" id="gaStepDelay" min="0" max="60" step="0.1" value="{{ default_step_delay }}" />
+          </label>
+          <div class="genome-legend">
+            <span><span class="swatch crossover"></span> crossover segment</span>
+            <span><span class="swatch mutation"></span> mutation swap</span>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
+
   </section>
 
 </main>

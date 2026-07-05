@@ -9,9 +9,8 @@
 
 import { initPopulation, evaluatePopulation, selectParents, crossoverStage, mutateStage } from "./api.js";
 import { getCities } from "./cityState.js";
-import { clearCanvas, drawCities, drawTour } from "./canvasUtils.js";
+import { clearCanvas, drawCities, drawTour, drawGrid } from "./canvasUtils.js";
 import { onCitiesChanged } from "./events.js";
-import { drawFitnessChart } from "./fitnessChart.js";
 import { formatDistance } from "./format.js";
 import { genomeRenderCap, minCities } from "./uiConfig.js";
 
@@ -73,10 +72,8 @@ function grabRefs() {
   refs.genomeList = document.getElementById("gaGenomeList");
   refs.genomeGen = document.getElementById("gaGenomeGen");
   refs.genomePop = document.getElementById("gaGenomePop");
-  refs.canvas = document.getElementById("gaCanvas");
+  refs.canvas = document.getElementById("setupCanvas");
   refs.ctx = refs.canvas.getContext("2d");
-  refs.chartCanvas = document.getElementById("gaChart");
-  refs.chartCtx = refs.chartCanvas.getContext("2d");
 }
 
 /**
@@ -126,7 +123,6 @@ function reset() {
   refs.bestVal.textContent = "—";
   refs.avgVal.textContent = "—";
   redrawBoard();
-  drawFitnessChart(refs.chartCtx, refs.chartCanvas, []);
   updatePhaseButton();
   renderGenomes();
 }
@@ -309,7 +305,6 @@ function updateUI() {
   refs.bestVal.textContent = state.bestEver ? formatDistance(state.bestEver.dist) : "—";
   refs.avgVal.textContent = avg != null ? formatDistance(avg) : "—";
   redrawBoard();
-  drawFitnessChart(refs.chartCtx, refs.chartCanvas, state.avgHistory);
   renderGenomes();
 }
 
@@ -321,6 +316,7 @@ function updateUI() {
 function redrawBoard() {
   const cities = getCities();
   clearCanvas(refs.ctx, refs.canvas);
+  drawGrid(refs.ctx, refs.canvas);
   drawCities(refs.ctx, refs.canvas, cities);
   if (state.bestEver) drawTour(refs.ctx, refs.canvas, cities, state.bestEver.order, { color: "#4fd984", width: 3 });
 }

@@ -8,7 +8,8 @@
 
 import { emitCitiesChanged, onBruteForceRunning, onCitiesChanged } from "./events.js";
 import { getCities, setCities, clearCities, randomCities, buildDistanceMatrix } from "./cityState.js";
-import { clearCanvas, drawCities, drawCompleteGraph } from "./canvasUtils.js";
+import { clearCanvas, drawCities, drawCompleteGraph, drawGrid, snapToGrid, getGridSpacingDistance } from "./canvasUtils.js";
+import { formatDistance } from "./format.js";
 
 const refs = {};
 
@@ -22,18 +23,20 @@ export function initCitySetupView() {
   refs.countInput = document.getElementById("cityCount");
   refs.randomizeBtn = document.getElementById("randomizeBtn");
   refs.clearBtn = document.getElementById("clearBtn");
-  refs.counter = document.getElementById("cityCounter");
+  refs.gridDistanceVal = document.getElementById("gridDistanceVal");
   refs.canvas = document.getElementById("setupCanvas");
   refs.ctx = refs.canvas.getContext("2d");
   refs.randomizeBtn.addEventListener("click", randomize);
   refs.clearBtn.addEventListener("click", clear);
   onCitiesChanged(redraw);
   onBruteForceRunning(setBusy);
+  updateGridDistance();
   randomize();
 }
 
 /**
- * Replace the current cities with a fresh random set of the requested size.
+ * Replace the current cities with a fresh random set of the requested size,
+ * snapped to grid intersections.
  *
  * @returns {void}
  */
@@ -42,7 +45,8 @@ function randomize() {
   const min = Number(refs.countInput.min);
   const max = Number(refs.countInput.max);
   const count = Math.max(min, Math.min(max, raw));
-  setCities(randomCities(count));
+  const cities = randomCities(count).map(snapToGrid);
+  setCities(cities);
   emitCitiesChanged();
 }
 
@@ -57,17 +61,27 @@ function clear() {
 }
 
 /**
- * Redraw the complete graph, city dots, and the counter.
+ * Update the grid distance display.
+ *
+ * @returns {void}
+ */
+function updateGridDistance() {
+  const distance = getGridSpacingDistance();
+  refs.gridDistanceVal.textContent = formatDistance(distance);
+}
+
+/**
+ * Redraw the grid, complete graph, and city dots.
  *
  * @returns {void}
  */
 function redraw() {
   const cities = getCities();
   clearCanvas(refs.ctx, refs.canvas);
+  drawGrid(refs.ctx, refs.canvas);
   const distMatrix = buildDistanceMatrix(cities);
   drawCompleteGraph(refs.ctx, refs.canvas, cities, { showDistances: true, distMatrix });
   drawCities(refs.ctx, refs.canvas, cities);
-  refs.counter.textContent = String(cities.length);
 }
 
 /**

@@ -1,0 +1,20 @@
+/* ============================================================
+   grid-info.css — Grid distance indicator below the canvas.
+   ============================================================ */
+
+.grid-info {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--canvas-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.grid-info span {
+  color: var(--accent);
+  font-weight: 600;
+}

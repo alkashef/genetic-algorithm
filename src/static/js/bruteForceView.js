@@ -8,7 +8,7 @@
 
 import { streamBruteForce } from "./api.js";
 import { getCities } from "./cityState.js";
-import { clearCanvas, drawCities, drawRoute } from "./canvasUtils.js";
+import { clearCanvas, drawCities, drawRoute, drawGrid } from "./canvasUtils.js";
 import { emitBruteForceRunning, onCitiesChanged } from "./events.js";
 import { formatDistance } from "./format.js";
 import { minCities } from "./uiConfig.js";
@@ -28,7 +28,7 @@ export function initBruteForceView() {
   refs.currentVal = document.getElementById("bfCurrentVal");
   refs.currentDistVal = document.getElementById("bfCurrentDistVal");
   refs.bestVal = document.getElementById("bfBestVal");
-  refs.canvas = document.getElementById("bfCanvas");
+  refs.canvas = document.getElementById("setupCanvas");
   refs.ctx = refs.canvas.getContext("2d");
   refs.solveBtn.addEventListener("click", toggleSolve);
   onCitiesChanged(reset);
@@ -62,7 +62,7 @@ function reset() {
 }
 
 /**
- * Redraw the board: city dots plus, optionally, the best route so far.
+ * Redraw the board: grid, city dots, and optionally the best route so far.
  *
  * @param {number[]} [bestRoute] - Best route to draw in green, if any.
  * @returns {void}
@@ -70,6 +70,7 @@ function reset() {
 function redrawBoard(bestRoute) {
   const cities = getCities();
   clearCanvas(refs.ctx, refs.canvas);
+  drawGrid(refs.ctx, refs.canvas);
   drawCities(refs.ctx, refs.canvas, cities);
   if (bestRoute) drawRoute(refs.ctx, refs.canvas, cities, bestRoute, { color: "#4fd984", width: 3 });
 }

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Genetic Algorithms — Lifecycle Concept Map</title>
+  <style>
+    :root{
+      --bg:#f6f8fb;--card:#ffffff;--ink:#152033;--muted:#617089;--line:#d9e2ef;
+      --navy:#10213f;--blue:#1f5eff;--teal:#0f9f8f;--amber:#d99000;--purple:#7755cc;--red:#c2463a;
+      --green-bg:#eaf8f5;--amber-bg:#fff5df;--blue-bg:#eef4ff;--purple-bg:#f1edff;--red-bg:#fff0ed;
+      --shadow:0 14px 30px rgba(20,32,51,.08);--radius:18px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at top left,#eef5ff,var(--bg) 44%);line-height:1.55}
+    .page{max-width:1240px;margin:0 auto;padding:40px 24px 72px}
+    header{background:linear-gradient(135deg,var(--navy),#173d73);color:#fff;border-radius:26px;padding:34px 34px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    header:after{content:"";position:absolute;right:-120px;top:-120px;width:330px;height:330px;border-radius:50%;background:rgba(255,255,255,.09)}
+    header h1{margin:0;font-size:34px;letter-spacing:-.03em;line-height:1.15}
+    header p{margin:12px 0 0;max-width:880px;color:#dce8ff;font-size:17px}
+    .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 22px;position:sticky;top:0;background:rgba(246,248,251,.92);backdrop-filter:blur(8px);z-index:3;padding:12px 0;border-bottom:1px solid rgba(217,226,239,.75)}
+    .tab-btn{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 3px 10px rgba(20,32,51,.04)}
+    .tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .tab{display:none}.tab.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-bottom:18px}
+    .card h2{font-size:23px;margin:0 0 10px;letter-spacing:-.02em}.card h3{font-size:18px;margin:0 0 10px}.card h4{font-size:15px;margin:18px 0 8px;color:var(--navy)}
+    .section-title{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}.section-title h2{margin:0}.num{display:inline-flex;min-width:34px;height:34px;align-items:center;justify-content:center;border-radius:10px;background:var(--blue-bg);color:var(--blue);font-weight:900;margin-right:10px}
+    .subgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}.sub{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfdff}.sub h4{margin:0 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+    .tag{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:800;margin:2px 4px 2px 0;border:1px solid transparent}.covered{background:var(--green-bg);color:#087869;border-color:#c8eee7}.todo{background:var(--amber-bg);color:#8a5b00;border-color:#f4ddb1}.tsp{background:var(--blue-bg);color:#1647bd;border-color:#d4e2ff}.time{background:var(--purple-bg);color:#5735a8;border-color:#ddd4ff}.danger{background:var(--red-bg);color:var(--red);border-color:#ffd0c8}
+    ul{margin:8px 0 0 19px;padding:0}li{margin:5px 0}.muted{color:var(--muted)}.small{font-size:13px}.tight li{margin:3px 0}
+    .flow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:18px}.flow div{background:#fff;border:1px solid rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.12);padding:11px 8px;border-radius:12px;text-align:center;font-weight:800;font-size:13px}
+    table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:#fff}th,td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}th{background:#f0f5ff;color:var(--navy);font-size:13px;text-transform:uppercase;letter-spacing:.04em}tr:last-child td{border-bottom:0}
+    code,.code{font-family:Consolas,Menlo,Monaco,monospace;background:#f2f5fb;border:1px solid var(--line);border-radius:8px;padding:2px 6px;color:#20314f}.codeblock{display:block;white-space:pre-wrap;padding:14px;margin-top:10px;border-radius:14px;background:#0f1b31;color:#eaf2ff;border:0;overflow:auto}
+    .callout{border-left:5px solid var(--teal);background:var(--green-bg);padding:14px 16px;border-radius:14px;margin-top:12px}.warn{border-left-color:var(--amber);background:var(--amber-bg)}.dangerbox{border-left-color:var(--red);background:var(--red-bg)}
+    .toc{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 18px}.toc a{text-decoration:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;color:var(--navy);font-size:13px;font-weight:800}
+    .checklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.check{background:#fbfdff;border:1px solid var(--line);border-radius:14px;padding:13px}.check b{display:block;margin-bottom:5px;color:var(--navy)}
+    @media(max-width:900px){.grid,.grid.three,.subgrid,.checklist{grid-template-columns:1fr}.flow{grid-template-columns:repeat(2,minmax(0,1fr))}header h1{font-size:28px}.tabs{position:static}}
+    @media print{.tabs{position:static}.tab{display:block!important}.tab-btn{display:none}.page{padding:0}body{background:#fff}.card,header{box-shadow:none;break-inside:avoid}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Genetic Algorithms — Lifecycle Concept Map</h1>
+      <p>A single structured map of what we covered, what remains for real implementation, and what is specific to TSP and timetable optimization.</p>
+      <div class="meta">
+        <span class="pill">Organized by GA lifecycle</span>
+        <span class="pill">Core vs use-case-specific separated</span>
+        <span class="pill">Dashboard tab added</span>
+      </div>
+      <div class="flow">
+        <div>Initialize</div><div>Evaluate</div><div>Select</div><div>Crossover</div><div>Mutate</div><div>Replace</div><div>Stop / Tune</div>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="Tabs">
+      <button class="tab-btn active" data-tab="core">Core GA Lifecycle</button>
+      <button class="tab-btn" data-tab="tsp">TSP Specifics</button>
+      <button class="tab-btn" data-tab="time">Timetable Specifics</button>
+      <button class="tab-btn" data-tab="dash">Dashboard</button>
+    </nav>
+
+    <main>
+      <section id="core" class="tab active">
+        <div class="card">
+          <h2>Core GA Lifecycle</h2>
+          <p class="muted">This tab contains concepts that apply broadly to genetic algorithms. Domain-specific choices are moved to the TSP and Timetable tabs.</p>
+          <div class="toc">
+            <a href="#c0">0. Framing</a><a href="#c1">1. Initialization</a><a href="#c2">2. Fitness</a><a href="#c3">3. Selection</a><a href="#c4">4. Crossover</a><a href="#c5">5. Mutation</a><a href="#c6">6. Replacement</a><a href="#c7">7. Hyperparameters</a><a href="#c8">8. Termination</a><a href="#c9">9. Diagnostics</a><a href="#c10">10. Constraints</a><a href="#c11">11. Hybridization</a><a href="#c12">12. Benchmarking</a>
+          </div>
+        </div>
+
+        <div id="c0" class="card">
+          <div class="section-title"><h2><span class="num">0</span>Problem framing & representation</h2><span class="tag covered">partly covered</span></div>
+          <p><b>Core idea:</b> before a GA can run, one candidate solution must be encoded as a genome/chromosome.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Binary encoding</li><li>Integer/vector encoding</li><li>Real-valued encoding</li><li>Permutation encoding</li><li>Assignment/matrix encoding</li><li>Tree/program encoding</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p>We focused on the principle that <b>the genome must match the problem structure</b>. A bad representation makes crossover/mutation invalid or meaningless.</p></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Representation is not a coding detail; it shapes the search.</li><li>Operators must respect the representation.</li><li>Validity is easier when the representation is designed well.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c1" class="card">
+          <div class="section-title"><h2><span class="num">1</span>Initialization</h2><span class="tag todo">still need to cover</span></div>
+          <p><b>Core idea:</b> initialization creates the first population. It controls starting diversity and starting quality.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Pure random initialization</li><li>Heuristic-seeded initialization</li><li>Mixed random + heuristic initialization</li><li>Diversity-aware initialization</li><li>Repair-after-initialization</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p><b>Next focus:</b> mixed initialization. It starts with broad random coverage but injects a few good heuristic candidates so the GA does not start blindly.</p></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Random-only gives diversity but may start weak.</li><li>Heuristic-only may reduce diversity.</li><li>Mixed initialization is usually safest.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c2" class="card">
+          <div class="section-title"><h2><span class="num">2</span>Fitness evaluation</h2><span class="tag covered">covered basics</span></div>
+          <p><b>Core idea:</b> the fitness function scores how good each genome is. It is the GA's definition of success.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Direct objective score</li><li>Penalty-based fitness</li><li>Feasibility-first scoring</li><li>Weighted multi-criteria fitness</li><li>Noisy/averaged fitness</li><li>Multi-objective fitness</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p>We focused on the simple version: compute a score for each genome, then use that score to guide selection.</p></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Fitness is where the problem becomes measurable.</li><li>Bad fitness produces bad learning.</li><li>For real problems, constraints often dominate fitness design.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c3" class="card">
+          <div class="section-title"><h2><span class="num">3</span>Selection</h2><span class="tag covered">covered</span></div>
+          <p><b>Core idea:</b> selection chooses which genomes become parents. It does not create children and does not mutate.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Roulette wheel selection</li><li>Rank selection</li><li>Tournament selection</li><li>Stochastic universal sampling</li><li>Truncation selection</li><li>Selection with replacement</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p><b>Tournament selection</b>: randomly choose <code>k</code> genomes; the best among them becomes a parent. Start with <code>k = 3</code>.</p><code class="codeblock">parent = best(randomly_choose(population, k=3))</code></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li><code>k</code> controls selection pressure.</li><li><code>k = 1</code> means random selection.</li><li>Large <code>k</code> can collapse diversity.</li><li>A strong genome may be selected multiple times.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c4" class="card">
+          <div class="section-title"><h2><span class="num">4</span>Crossover</h2><span class="tag covered">covered concept</span></div>
+          <p><b>Core idea:</b> crossover combines information from two parents to create children.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>One-point crossover</li><li>Two-point crossover</li><li>Uniform crossover</li><li>Blend/arithmetic crossover</li><li>Validity-preserving crossover</li><li>Representation-specific crossover</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p>We focused on the rule that crossover must fit the genome representation. For structured problems, generic crossover can produce invalid children.</p></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Crossover is recombination, not randomness alone.</li><li>Crossover rate controls how often selected parents recombine.</li><li>Practical starting rate: <code>0.80–0.95</code>, often <code>0.90</code>.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c5" class="card">
+          <div class="section-title"><h2><span class="num">5</span>Mutation</h2><span class="tag covered">covered concept</span></div>
+          <p><b>Core idea:</b> mutation adds controlled variation so the population does not become too narrow.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Bit-flip mutation</li><li>Random-reset mutation</li><li>Gaussian mutation</li><li>Swap-like mutation</li><li>Segment/change mutation</li><li>Adaptive mutation</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p>We focused on the distinction between <b>mutation rate</b> and <b>mutation strength</b>.</p><ul class="tight"><li>Rate = how often mutation happens.</li><li>Strength = how large the change is.</li></ul></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Too little mutation → stuck.</li><li>Too much mutation → near-random search.</li><li>If diversity is low and progress stalls, increase mutation temporarily.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c6" class="card">
+          <div class="section-title"><h2><span class="num">6</span>Replacement strategy & elitism</h2><span class="tag covered">covered</span></div>
+          <p><b>Core idea:</b> replacement decides who enters the next generation after children are created.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Generational replacement</li><li>Elitist generational replacement</li><li>Steady-state GA</li><li>Replace-worst strategy</li><li>Age-based replacement</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p><b>Elitist generational replacement</b>: copy a few best old genomes unchanged, then fill the rest with new children.</p><code class="codeblock">new_population = elites + children</code></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Elitism protects progress.</li><li>Too much elitism kills diversity.</li><li>Elites can also be selected as parents.</li><li>For population 100, start with 1–2 elites.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c7" class="card">
+          <div class="section-title"><h2><span class="num">7</span>Hyperparameters</h2><span class="tag covered">covered basics</span></div>
+          <p><b>Core idea:</b> hyperparameters are the knobs that control GA behavior.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of knobs</h4><ul class="tight"><li>Population size</li><li>Elite count</li><li>Tournament size <code>k</code></li><li>Crossover rate</li><li>Mutation rate</li><li>Mutation strength</li><li>Max generations</li><li>Evaluation/time budget</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p>We focused on a practical starting profile:</p><code class="codeblock">population_size = 100
+elite_count = 2
+tournament_k = 3
+crossover_rate = 0.90
+mutation_rate = 0.10</code></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>No fixed ratio exists between answer-space size and population size.</li><li>Population size scales with problem size, diversity need, and compute budget.</li><li>Total search budget = <code>population_size × generations</code>.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c8" class="card">
+          <div class="section-title"><h2><span class="num">8</span>Termination criteria</h2><span class="tag todo">still need to cover</span></div>
+          <p><b>Core idea:</b> termination decides when the GA stops running.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Maximum generations</li><li>No improvement for N generations</li><li>Target fitness reached</li><li>Time budget reached</li><li>Evaluation budget reached</li><li>Diversity collapse stop/restart rule</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p><b>Next focus:</b> combine max generations with stagnation stopping.</p><code class="codeblock">stop if generation == max_generations
+or no_improvement &gt; patience</code></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Stopping by generation alone is simple but blind.</li><li>Stagnation detection is more practical.</li><li>For real use, stop rules should match compute budget.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c9" class="card">
+          <div class="section-title"><h2><span class="num">9</span>Diagnostics</h2><span class="tag todo">still need to cover</span></div>
+          <p><b>Core idea:</b> diagnostics tell you whether the GA is healthy, stuck, too random, or converging too fast.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Best fitness curve</li><li>Average/median fitness curve</li><li>Worst fitness curve</li><li>Fitness spread</li><li>Diversity measure</li><li>Stagnation counter</li><li>Operator success rates</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p><b>Next focus:</b> dashboard-style diagnostics. The dashboard tab lists the exact knobs, curves, and alerts to implement.</p></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>One best score is not enough.</li><li>Track both performance and diversity.</li><li>Diagnostics guide parameter tuning.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c10" class="card">
+          <div class="section-title"><h2><span class="num">10</span>Constraint handling</h2><span class="tag todo">still need to cover deeply</span></div>
+          <p><b>Core idea:</b> real GA problems often have invalid solutions. You need a rule for invalid genomes.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Valid operators only</li><li>Repair invalid genomes</li><li>Penalty functions</li><li>Reject invalid children</li><li>Feasibility-first selection</li><li>Decoder-based representation</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p><b>Next focus:</b> compare repair vs penalty vs valid operators, because the best choice depends heavily on the problem.</p></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Hard constraints should not be treated like minor preferences.</li><li>Repair can save useful genetic material.</li><li>Penalties need careful weighting.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c11" class="card">
+          <div class="section-title"><h2><span class="num">11</span>Hybrid GA / memetic algorithms</h2><span class="tag todo">still need to cover</span></div>
+          <p><b>Core idea:</b> combine GA's global exploration with a local search that improves individual solutions.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>GA + local search</li><li>GA + hill climbing</li><li>GA + simulated annealing</li><li>GA + problem heuristic</li><li>Lamarckian update: replace genome with improved version</li><li>Baldwinian update: fitness improves without replacing genome</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p><b>Next focus:</b> when to run local search: on every child, only elites, periodically, or only late in the run.</p></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Plain GA is often not enough for strong performance.</li><li>Hybridization usually improves real implementations.</li><li>Local search increases compute cost, so apply selectively.</li></ul></div>
+          </div>
+        </div>
+
+        <div id="c12" class="card">
+          <div class="section-title"><h2><span class="num">12</span>Benchmarking, reproducibility & scaling</h2><span class="tag todo">still need to cover</span></div>
+          <p><b>Core idea:</b> real GA work must prove that the algorithm is better than simple baselines and that results are reproducible.</p>
+          <div class="subgrid">
+            <div class="sub"><h4>List of techniques</h4><ul class="tight"><li>Random-search baseline</li><li>Greedy baseline</li><li>Exact/brute-force comparison for tiny cases</li><li>Known benchmark instances</li><li>Multiple random seeds</li><li>Parameter sweep experiments</li><li>Fitness caching</li><li>Parallel evaluation</li></ul></div>
+            <div class="sub"><h4>Focus section</h4><p><b>Next focus:</b> multiple runs with fixed seeds and a comparison table: best, average, standard deviation, and runtime.</p></div>
+            <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>One GA run is not evidence.</li><li>Compare against simple baselines first.</li><li>Track seeds, parameters, runtime, and final score.</li></ul></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tsp" class="tab">
+        <div class="card">
+          <h2>TSP Specifics — only what is special for route optimization</h2>
+          <p class="muted">This tab excludes generic GA mechanics already covered in Core GA. It keeps only route/TSP-specific choices.</p>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h2>Representation</h2>
+            <span class="tag tsp">TSP-specific</span>
+            <div class="subgrid">
+              <div class="sub"><h4>Techniques</h4><ul class="tight"><li>Permutation route</li><li>Closed tour representation</li><li>Canonicalized tour to reduce duplicates</li></ul></div>
+              <div class="sub"><h4>Focus</h4><p>One genome is an ordered route containing every city exactly once.</p><code class="codeblock">[A, B, C, D, E]</code></div>
+              <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Same cities appear in every genome.</li><li>Quality comes from city adjacencies/edges.</li><li>Index position alone is not the key signal.</li></ul></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Search space</h2>
+            <span class="tag tsp">TSP-specific</span>
+            <div class="subgrid">
+              <div class="sub"><h4>Techniques</h4><ul class="tight"><li>Directed tour count</li><li>Symmetric tour count</li><li>Fix start city to avoid rotations</li><li>Normalize direction when symmetric</li></ul></div>
+              <div class="sub"><h4>Focus</h4><p>For symmetric TSP, the number of unique tours is approximately:</p><code class="codeblock">(n - 1)! / 2</code></div>
+              <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Search space grows factorially.</li><li>Population never covers a meaningful percentage.</li><li>Total evaluations matter more than coverage ratio.</li></ul></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>TSP operators</h2>
+          <table>
+            <thead><tr><th>Lifecycle step</th><th>TSP-specific techniques</th><th>Focus we used</th><th>Important lessons learned</th></tr></thead>
+            <tbody>
+              <tr><td><b>Initialization</b></td><td>Random permutations; greedy/nearest-neighbor seeds; mixed random + heuristic seeds</td><td>Random routes as baseline; heuristic seeding still to cover</td><td>Keep diversity; do not fill the whole population with one greedy pattern.</td></tr>
+              <tr><td><b>Fitness</b></td><td>Total tour distance; closed-loop distance; optional penalties for invalid routes</td><td>Shorter route = better fitness</td><td>For minimization, lower distance is better; often convert to score if the GA expects maximization.</td></tr>
+              <tr><td><b>Crossover</b></td><td>OX; PMX; CX; edge recombination; edge assembly</td><td><b>OX / Order Crossover</b></td><td>OX preserves a slice + relative order and keeps routes valid. It does not strongly preserve edges.</td></tr>
+              <tr><td><b>Mutation</b></td><td>Swap; inversion; insert; scramble</td><td><b>Inversion mutation</b></td><td>Inversion is natural for routes because it changes edges while keeping a valid permutation.</td></tr>
+              <tr><td><b>Diversity</b></td><td>Edge diversity; adjacency overlap; duplicate-tour detection</td><td><b>Edge diversity</b></td><td>For symmetric TSP, <code>AB = BA</code>. Measure shared adjacencies, not same city index.</td></tr>
+              <tr><td><b>Hybridization</b></td><td>2-opt; 3-opt; local improvement for elites/children</td><td><b>GA + 2-opt</b> still to cover</td><td>This is where TSP GA performance usually jumps.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2>Recommended first serious TSP GA setup</h2>
+          <code class="codeblock">representation = permutation_route
+fitness = total_closed_tour_distance
+selection = tournament(k=3)
+crossover = OX
+crossover_rate = 0.90
+mutation = inversion
+mutation_rate = 0.10
+replacement = elitist_generational
+elite_count = 2
+population_size = 100
+termination = max_generations + stagnation_patience</code>
+          <div class="callout"><b>TSP-specific key lesson:</b> route quality is mostly about edges/adjacencies, so diagnostics and advanced crossover should eventually become edge-aware.</div>
+        </div>
+      </section>
+
+      <section id="time" class="tab">
+        <div class="card">
+          <h2>Timetable Specifics — only what is special for scheduling</h2>
+          <p class="muted">This tab excludes generic GA mechanics already covered in Core GA. It keeps only timetable-specific modeling, constraints, operators, and diagnostics.</p>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h2>Timetable representation</h2>
+            <span class="tag time">timetable-specific</span>
+            <div class="subgrid">
+              <div class="sub"><h4>Techniques</h4><ul class="tight"><li>Event-to-slot assignment</li><li>Event-to-slot-room assignment</li><li>Matrix timetable representation</li><li>Decoder representation</li></ul></div>
+              <div class="sub"><h4>Focus</h4><p>One genome is one full timetable: each event/class is assigned to a time slot and usually a room.</p><code class="codeblock">event_i → (day, period, room)</code></div>
+              <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>The genome is an assignment, not a simple route.</li><li>Feasibility is harder than in TSP.</li><li>Representation should make impossible conflicts less likely.</li></ul></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Hard vs soft constraints</h2>
+            <span class="tag time">timetable-specific</span>
+            <div class="subgrid">
+              <div class="sub"><h4>Hard constraints</h4><ul class="tight"><li>Teacher cannot teach two classes at once</li><li>Room cannot host two classes at once</li><li>Student group cannot attend two classes at once</li><li>Room capacity/equipment must fit</li><li>Teacher/room availability must be respected</li></ul></div>
+              <div class="sub"><h4>Soft constraints</h4><ul class="tight"><li>Minimize teacher gaps</li><li>Avoid very early/late sessions</li><li>Spread load across days</li><li>Prefer certain rooms</li><li>Improve fairness of schedules</li></ul></div>
+              <div class="sub"><h4>Takeaways</h4><ul class="tight"><li>Hard constraints define validity.</li><li>Soft constraints define quality.</li><li>Penalty weights are critical and easy to get wrong.</li></ul></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Timetable operators</h2>
+          <table>
+            <thead><tr><th>Lifecycle step</th><th>Timetable-specific techniques</th><th>Best practical focus</th><th>Important lessons</th></tr></thead>
+            <tbody>
+              <tr><td><b>Initialization</b></td><td>Constructive scheduling; random assignment + repair; greedy feasible seeding; mixed seeds</td><td><b>Feasible-first mixed initialization</b></td><td>Pure random schedules may be mostly invalid. Start by reducing hard conflicts early.</td></tr>
+              <tr><td><b>Fitness</b></td><td>Hard violation count; weighted soft penalties; feasibility-first score; conflict severity scoring</td><td><b>Two-layer score</b>: hard first, soft second</td><td>A timetable with fewer hard violations usually beats a pretty but invalid timetable.</td></tr>
+              <tr><td><b>Crossover</b></td><td>Day-block crossover; class-group block crossover; teacher-block crossover; repair-after-crossover</td><td><b>Block crossover + repair</b></td><td>Naive crossover can destroy feasibility. Preserve meaningful timetable blocks.</td></tr>
+              <tr><td><b>Mutation</b></td><td>Move event; swap two events; change room; change period; conflict-directed mutation</td><td><b>Conflict-directed mutation</b></td><td>Do not mutate randomly only; target conflicts when hard violations exist.</td></tr>
+              <tr><td><b>Repair</b></td><td>Reschedule conflicting events; room reassignment; period reassignment; backtracking repair</td><td><b>Repair invalid children</b></td><td>Repair is usually essential for timetables.</td></tr>
+              <tr><td><b>Diagnostics</b></td><td>Hard violations; soft penalty breakdown; feasibility ratio; teacher gaps; room utilization; conflict heatmaps</td><td><b>Violation dashboard</b></td><td>Track conflict types separately, not just total fitness.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2>Recommended first timetable GA setup</h2>
+          <code class="codeblock">representation = event_to_slot_room_assignment
+fitness = hard_violation_penalty + soft_preference_penalty
+selection = tournament(k=3)
+crossover = block_crossover + repair
+mutation = move_or_swap_conflicting_event
+mutation_strategy = conflict_directed_when_invalid
+replacement = elitist_generational
+elite_rule = keep_best_feasible_or_lowest_violation
+termination = time_budget + stagnation_patience</code>
+          <div class="callout warn"><b>Timetable-specific key lesson:</b> the central challenge is not just optimization. It is maintaining or recovering feasibility under many hard constraints.</div>
+        </div>
+      </section>
+
+      <section id="dash" class="tab">
+        <div class="card">
+          <h2>Dashboard — knobs, algorithm choices, curves, and alerts</h2>
+          <p class="muted">This tab defines what a real GA implementation should expose and track. Think of it as the control panel for experimentation, tuning, and debugging.</p>
+        </div>
+
+        <div class="grid three">
+          <div class="card">
+            <h2>Global parameters</h2>
+            <ul>
+              <li>Random seed</li>
+              <li>Population size</li>
+              <li>Max generations</li>
+              <li>Max evaluations</li>
+              <li>Time budget</li>
+              <li>Objective direction: minimize/maximize</li>
+              <li>Number of repeated runs</li>
+              <li>Parallel evaluation on/off</li>
+              <li>Duplicate genome handling</li>
+              <li>Restart policy</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h2>Algorithm choices</h2>
+            <ul>
+              <li>Representation type</li>
+              <li>Initialization method</li>
+              <li>Selection method + parameters</li>
+              <li>Crossover operator + rate</li>
+              <li>Mutation operator + rate + strength</li>
+              <li>Replacement strategy</li>
+              <li>Elitism on/off + elite count</li>
+              <li>Constraint handling method</li>
+              <li>Repair operator on/off</li>
+              <li>Local search / hybridization on/off</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h2>Adaptive controls</h2>
+            <ul>
+              <li>Increase mutation if diversity is low</li>
+              <li>Decrease mutation if search is unstable</li>
+              <li>Reduce selection pressure if elites dominate</li>
+              <li>Increase selection pressure if progress is too slow</li>
+              <li>Trigger restart after long stagnation</li>
+              <li>Enable local search late in the run</li>
+              <li>Stop when target or patience is reached</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Curves to plot per generation</h2>
+          <div class="checklist">
+            <div class="check"><b>Fitness curves</b><span class="muted">Best fitness, average fitness, median fitness, worst fitness, fitness spread.</span></div>
+            <div class="check"><b>Diversity curves</b><span class="muted">Unique genome count, representation-specific diversity, duplicate rate, elite dominance.</span></div>
+            <div class="check"><b>Convergence curves</b><span class="muted">Stagnation counter, generations since best improvement, improvement per generation.</span></div>
+            <div class="check"><b>Operator curves</b><span class="muted">Crossover success rate, mutation success rate, repair success rate, local-search improvement.</span></div>
+            <div class="check"><b>Constraint curves</b><span class="muted">Feasible ratio, hard violation count, soft penalty score, violation type breakdown.</span></div>
+            <div class="check"><b>Performance curves</b><span class="muted">Evaluation time, generation runtime, cache hit rate, evaluations per second.</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Dashboard cards/tables</h2>
+          <table>
+            <thead><tr><th>Dashboard element</th><th>What it shows</th><th>Why it matters</th></tr></thead>
+            <tbody>
+              <tr><td><b>Current best genome</b></td><td>Best solution, fitness, generation found</td><td>Tracks the best result so far.</td></tr>
+              <tr><td><b>Run configuration</b></td><td>Seed, population, rates, operators, constraints</td><td>Makes runs reproducible.</td></tr>
+              <tr><td><b>Top-k elites</b></td><td>Best few genomes and similarity between them</td><td>Detects elite domination.</td></tr>
+              <tr><td><b>Population snapshot</b></td><td>Diversity, duplicates, fitness spread</td><td>Shows population health.</td></tr>
+              <tr><td><b>Experiment comparison</b></td><td>Multiple runs by parameter setting</td><td>Supports tuning by evidence, not guessing.</td></tr>
+              <tr><td><b>Baseline comparison</b></td><td>GA vs random, greedy, brute force small cases</td><td>Proves the GA adds value.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h2>Alerts to implement</h2>
+            <ul>
+              <li><span class="tag danger">Premature convergence</span> Diversity below threshold while best fitness stagnates.</li>
+              <li><span class="tag danger">Too random</span> Fitness jumps wildly and average does not improve.</li>
+              <li><span class="tag danger">Elite domination</span> Top genomes occupy too much of the population.</li>
+              <li><span class="tag danger">No feasible solutions</span> Feasible ratio stays near zero.</li>
+              <li><span class="tag danger">Duplicate population</span> Duplicate genome rate is high.</li>
+              <li><span class="tag danger">Slow run</span> Evaluation time dominates runtime.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h2>Run summary metrics</h2>
+            <ul>
+              <li>Best final fitness</li>
+              <li>Mean final fitness across runs</li>
+              <li>Standard deviation across runs</li>
+              <li>Best generation found</li>
+              <li>Total evaluations</li>
+              <li>Total runtime</li>
+              <li>Feasible solution rate</li>
+              <li>Improvement over baseline</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Use-case-specific dashboard additions</h2>
+          <table>
+            <thead><tr><th>Use case</th><th>Extra knobs/plots/cards</th></tr></thead>
+            <tbody>
+              <tr><td><b>TSP</b></td><td>Best route length; route visualization; edge diversity; edge overlap with elites; crossing count for Euclidean TSP; 2-opt improvement; distance-matrix validation.</td></tr>
+              <tr><td><b>Timetable</b></td><td>Hard violation breakdown; teacher conflicts; room conflicts; student-group conflicts; room utilization heatmap; teacher gap chart; daily load balance; timetable matrix view.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2>Minimal dashboard schema</h2>
+          <code class="codeblock">generation
+best_fitness
+avg_fitness
+median_fitness
+worst_fitness
+fitness_std
+diversity_score
+duplicate_rate
+feasible_ratio
+hard_violations
+soft_penalty
+mutation_rate
+crossover_rate
+selection_pressure
+stagnation_count
+evaluations_total
+runtime_seconds
+best_genome_snapshot</code>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('.tab-btn');
+    const tabs = document.querySelectorAll('.tab');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        tabs.forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      });
+    });
+  </script>
+</body>
+</html>

@@ -17,6 +17,63 @@ export function clearCanvas(ctx, canvas) {
 }
 
 /**
+ * Draw a light grey grid matching the snap-to-grid intersections.
+ * Grid is 20×20 in normalized space, so spacing is calculated as canvas size / 20.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Target context.
+ * @param {HTMLCanvasElement} canvas - Canvas owning the context.
+ * @param {{color?: string, width?: number}} [options] - Grid styling.
+ * @returns {void}
+ */
+export function drawGrid(ctx, canvas, { color = "rgba(180, 180, 180, 0.35)", width = 0.5 } = {}) {
+  const gridSize = 0.05;
+  const spacingX = canvas.width * gridSize;
+  const spacingY = canvas.height * gridSize;
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+
+  for (let x = 0; x <= canvas.width; x += spacingX) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+
+  for (let y = 0; y <= canvas.height; y += spacingY) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+}
+
+/**
+ * Snap a normalized coordinate to the nearest grid intersection.
+ * Grid spacing is 1/20 of normalized space (20×20 grid).
+ *
+ * @param {{x: number, y: number}} c - City in normalized space.
+ * @returns {{x: number, y: number}} Snapped coordinates.
+ */
+export function snapToGrid(c) {
+  const gridSize = 0.05;
+  return {
+    x: Math.round(c.x / gridSize) * gridSize,
+    y: Math.round(c.y / gridSize) * gridSize,
+  };
+}
+
+/**
+ * Get the distance between two horizontally or vertically adjacent grid intersections.
+ * Grid spacing is 0.05 in normalized space (1/20 of the [0,1] range).
+ *
+ * @returns {number} Grid spacing distance in normalized units.
+ */
+export function getGridSpacingDistance() {
+  return 0.05;
+}
+
+/**
  * Convert a normalized city coordinate to canvas pixels.
  *
  * @param {{x: number, y: number}} c - City in normalized space.
