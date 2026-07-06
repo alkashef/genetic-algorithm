@@ -1,12 +1,12 @@
 """
 tests/test_ga_params.py
 
-Unit tests for the SelectionParams data model in src/models/ga_params.py.
+Unit tests for the SelectionParams data model in src/solvers/ga/ga_params.py.
 """
 
 import unittest
 
-from src.models.ga_params import SelectionParams
+from src.solvers.ga.ga_params import SelectionParams
 
 
 class TestSelectionParamsFromDict(unittest.TestCase):

@@ -1,5 +1,5 @@
 """
-src/routes/page_routes.py
+src/api/page_routes.py
 
 Serves the application's single HTML page.
 Does NOT expose solver endpoints — see ga_routes.py and bruteforce_routes.py.

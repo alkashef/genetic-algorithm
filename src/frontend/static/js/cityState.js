@@ -65,7 +65,7 @@ export function randomCities(count, margin = 0.06) {
  * @param {{x: number, y: number}} b - Second city.
  * @returns {number} The straight-line distance.
  */
-export function distance(a, b) {
+function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 

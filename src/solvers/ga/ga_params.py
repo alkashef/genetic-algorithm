@@ -1,9 +1,9 @@
 """
-src/models/ga_params.py
+src/solvers/ga/ga_params.py
 
 Data model for genetic-algorithm selection parameters.
 Defines the structure only — validation/clamping of raw user input is the
-frontend's concern, and business logic lives in src/services/ga_service.py.
+frontend's concern, and business logic lives in src/solvers/ga/ga_service.py.
 """
 
 from dataclasses import dataclass

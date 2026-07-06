@@ -12,10 +12,9 @@ and its fitness history — against the known optimum.
 
 ## Stack
 
-- **Backend**: Python 3 (developed on 3.14), Flask 3.1.3, python-dotenv 1.2.2, DEAP 1.4.1
+- **Backend**: Python 3 (developed on 3.14), Flask 3.1.3, python-dotenv 1.2.2
 - **Frontend**: semantic HTML (Jinja2 template), modular CSS, JavaScript ES6+ modules
 - **Template engine**: Jinja2 (Flask default)
-- **Evolutionary computing**: DEAP (Distributed Evolutionary Algorithms in Python)
 - **Tests**: Python standard-library `unittest`
 - No JavaScript dependencies and no build step
 
@@ -26,27 +25,29 @@ and its fitness history — against the known optimum.
 ├── config/
 │   ├── .env                       # Environment variables (local only, never committed)
 │   └── .env.example               # Committed template with all keys, no values
-├── docs/                          # Project documentation (design.md, plan.md, ga_learning_guide.html)
 ├── src/
 │   ├── config.py                  # Sole reader of config/.env; exports typed constants
-│   ├── routes/
+│   ├── api/
 │   │   ├── page_routes.py         # Serves the single page, injects UI config
 │   │   ├── ga_routes.py           # /api/ga/* — one endpoint per evolution stage
 │   │   └── bruteforce_routes.py   # /api/bruteforce — NDJSON event stream
-│   ├── services/
-│   │   ├── ga_service.py          # GA logic: OX crossover, swap mutation, selection
-│   │   └── bruteforce_service.py  # Heap's-algorithm enumeration as an event generator
-│   ├── models/
-│   │   └── ga_params.py           # SelectionParams dataclass
-│   ├── utils/
-│   │   └── tsp_math.py            # Pure geometry: distance matrix, route/tour length
-│   ├── static/
-│   │   ├── css/                   # One stylesheet per component (base, tabs, controls, …)
-│   │   ├── js/                    # One module per concern (api, views, chart, events, …)
-│   │   └── assets/                # Images, fonts, icons (currently empty)
-│   └── templates/
-│       └── index.html             # Jinja2 single-page shell
-├── tests/                         # Mirrors src/ (models, services, utils)
+│   ├── solvers/
+│   │   ├── common/
+│   │   │   └── tsp_math.py        # Pure geometry: distance matrix, route/tour length
+│   │   ├── ga/
+│   │   │   ├── ga_params.py       # SelectionParams dataclass
+│   │   │   ├── ga_service.py      # Public stage API: init, evaluate, select, crossover, mutate
+│   │   │   └── ga_pipeline.py     # Operator engine: OX crossover, swap mutation, selection
+│   │   └── bruteforce/
+│   │       └── bruteforce_service.py  # Heap's-algorithm enumeration as an event generator
+│   └── frontend/
+│       ├── static/
+│       │   ├── css/               # One stylesheet per component (base, tabs, controls, …)
+│       │   ├── js/                # One module per concern (api, views, chart, events, …)
+│       │   └── assets/            # Images, fonts, icons (currently empty)
+│       └── templates/
+│           └── index.html         # Jinja2 single-page shell
+├── tests/                         # Flat, mirrors src/solvers/ (one test file per source module)
 ├── main.py                        # App entry point — wiring only
 └── requirements.txt               # Pinned Python dependencies
 ```
@@ -88,9 +89,9 @@ evolution stage:
 
 ## Technical details
 
-**Genetic algorithm** — implemented with DEAP framework; permutation encoding;
-tournament (configurable size) or roulette-wheel selection; Order Crossover (OX),
-which preserves relative city order; swap mutation; configurable elite count (top
+**Genetic algorithm** — permutation encoding; tournament (configurable size)
+or roulette-wheel selection; Order Crossover (OX), which preserves relative
+city order; swap mutation; configurable elite count (top
 N individuals carried over unchanged; 0 disables elitism). Fitness is the
 closed-tour distance (minimized). Evolution is split into discrete stages
 (init, evaluate, select, crossover, mutate) so the frontend can step through

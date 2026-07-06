@@ -1,15 +1,15 @@
 """
-src/routes/ga_routes.py
+src/api/ga_routes.py
 
 HTTP endpoints for the genetic algorithm — one endpoint per evolution stage.
 Request parsing and response shaping only; all algorithm logic is delegated
-to src/services/ga_service.py.
+to src/solvers/ga/ga_service.py.
 """
 
 from flask import Blueprint, jsonify, request
 
-from src.models.ga_params import SelectionParams
-from src.services import ga_service
+from src.solvers.ga import ga_service
+from src.solvers.ga.ga_params import SelectionParams
 
 ga_bp = Blueprint("ga", __name__, url_prefix="/api/ga")
 

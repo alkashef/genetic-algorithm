@@ -8,10 +8,10 @@ using the configuration constants from src/config.py.
 
 from flask import Flask
 
+from src.api.bruteforce_routes import bruteforce_bp
+from src.api.ga_routes import ga_bp
+from src.api.page_routes import page_bp
 from src.config import FLASK_DEBUG, FLASK_HOST, FLASK_PORT
-from src.routes.bruteforce_routes import bruteforce_bp
-from src.routes.ga_routes import ga_bp
-from src.routes.page_routes import page_bp
 
 
 def create_app() -> Flask:
@@ -23,8 +23,8 @@ def create_app() -> Flask:
     """
     app = Flask(
         __name__,
-        static_folder="src/static",
-        template_folder="src/templates",
+        static_folder="src/frontend/static",
+        template_folder="src/frontend/templates",
     )
     app.register_blueprint(page_bp)
     app.register_blueprint(ga_bp)

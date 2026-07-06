@@ -25,15 +25,16 @@ Staff Mind/
 ├── data/                       # Data files (CSVs, JSONs, SQLite, etc.)
 ├── docs/                       # Project documentation and reference material
 ├── src/
-│   ├── routes/                 # Flask blueprints — one file per domain
-│   ├── services/               # Business logic — no Flask imports here
-│   ├── models/                 # Data models / schema definitions
-│   ├── utils/                  # Shared pure-Python utilities
-│   ├── static/
-│   │   ├── css/                # One CSS file per component or feature
-│   │   ├── js/                 # One JS module per domain concern
-│   │   └── assets/             # Images, fonts, icons
-│   └── templates/              # Jinja2 templates; partials in templates/partials/
+│   ├── api/                     # Flask blueprints — one file per domain; HTTP wiring only
+│   ├── solvers/                 # One self-contained package per algorithm
+│   │   ├── common/              # Pure-Python helpers shared across solvers
+│   │   └── <name>/              # Params, public service API, and internal logic together
+│   └── frontend/
+│       ├── static/
+│       │   ├── css/            # One CSS file per component or feature
+│       │   ├── js/              # One JS module per domain concern
+│       │   └── assets/          # Images, fonts, icons
+│       └── templates/           # Jinja2 templates; partials in templates/partials/
 ├── tests/                      # Flat: one test file per source module (e.g., tests/test_user_service.py)
 ├── main.py                     # App entry point — wiring only, no logic
 └── requirements.txt            # Pinned Python dependencies
@@ -54,12 +55,11 @@ Staff Mind/
 
 | Layer | Responsibility |
 | --- | --- |
-| `src/routes/` | HTTP request/response wiring only — delegates to `services/` |
-| `src/services/` | Business logic — no Flask, no HTTP concepts |
-| `src/models/` | Data structure definitions only |
-| `src/utils/` | Pure, stateless helper functions |
-| `src/static/js/` | UI behavior — no business logic |
-| `src/static/css/` | Presentation — no layout logic in HTML |
+| `src/api/` | HTTP request/response wiring only — delegates to `solvers/` |
+| `src/solvers/<name>/` | One self-contained solver: its own params, public service API, and internal logic — no Flask, no HTTP concepts |
+| `src/solvers/common/` | Pure, stateless helpers shared across solvers |
+| `src/frontend/static/js/` | UI behavior — no business logic |
+| `src/frontend/static/css/` | Presentation — no layout logic in HTML |
 
 ### Encapsulation
 
@@ -177,8 +177,8 @@ Each file starts with a section header:
 
 ## What Claude Must Not Do
 
-- Do not put business logic in route handlers — delegate to `services/`
-- Do not put Flask/HTTP imports in `services/` or `utils/`
+- Do not put business logic in route handlers — delegate to `solvers/`
+- Do not put Flask/HTTP imports in `solvers/`
 - Do not add styles to HTML files (`style=""` or `<style>` blocks)
 - Do not add logic to HTML files (`onclick=""` or `<script>` blocks, except the root entry point)
 - Do not produce undocumented functions, classes, or modules
@@ -224,7 +224,7 @@ Claude must keep `README.md` current after every change that affects it.
 
 - All tests live flat in `tests/`, one file per source module (e.g., `tests/test_user_service.py`)
 - Follow TDD: write the test first, then implement the function to pass it
-- Every new function in `services/` and `utils/` must have a corresponding test
+- Every new function in `solvers/` must have a corresponding test
 - Claude must create or update the relevant test file in the same response as the implementation
 
 ---

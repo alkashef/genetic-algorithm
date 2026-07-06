@@ -1,9 +1,9 @@
 """
-src/routes/bruteforce_routes.py
+src/api/bruteforce_routes.py
 
 HTTP endpoint for the brute-force solver. Streams solver events to the
 browser as newline-delimited JSON; serialization is the only work done here —
-the enumeration itself lives in src/services/bruteforce_service.py.
+the enumeration itself lives in src/solvers/bruteforce/bruteforce_service.py.
 """
 
 import json
@@ -11,7 +11,7 @@ import json
 from flask import Blueprint, Response, request
 
 from src.config import DEFAULT_STEP_DELAY_SECONDS
-from src.services import bruteforce_service
+from src.solvers.bruteforce import bruteforce_service
 
 bruteforce_bp = Blueprint("bruteforce", __name__, url_prefix="/api/bruteforce")
 

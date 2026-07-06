@@ -1,16 +1,18 @@
 """
 tests/test_ga_service.py
 
-Unit tests for the genetic-algorithm stages in src/services/ga_service.py.
+Unit tests for the genetic-algorithm stages in src/solvers/ga/ga_service.py.
 Each stage is verified to preserve valid tours (permutations) and to honor
-its parameters (elitism, selection strategy, rates).
+its parameters (elitism, selection strategy, rates). The operator engine
+these stages delegate to (src/solvers/ga/ga_pipeline.py) is exercised
+indirectly through this same public stage API.
 """
 
 import random
 import unittest
 
-from src.models.ga_params import SelectionParams
-from src.services import ga_service
+from src.solvers.ga import ga_service
+from src.solvers.ga.ga_params import SelectionParams
 
 
 def _make_cities(n, seed=1):

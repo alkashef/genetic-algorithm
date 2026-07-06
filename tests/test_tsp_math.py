@@ -1,12 +1,12 @@
 """
 tests/test_tsp_math.py
 
-Unit tests for the pure TSP geometry helpers in src/utils/tsp_math.py.
+Unit tests for the pure TSP geometry helpers in src/solvers/common/tsp_math.py.
 """
 
 import unittest
 
-from src.utils.tsp_math import build_distance_matrix, distance, route_distance, tour_distance
+from src.solvers.common.tsp_math import build_distance_matrix, distance, route_distance, tour_distance
 
 
 class TestDistance(unittest.TestCase):

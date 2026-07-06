@@ -1,17 +1,18 @@
 """
 tests/test_bruteforce_service.py
 
-Unit tests for the brute-force solver in src/services/bruteforce_service.py.
-Verifies the route count, the event protocol, and — against an independent
-itertools enumeration — that the reported best route is the true optimum.
+Unit tests for the brute-force solver in
+src/solvers/bruteforce/bruteforce_service.py. Verifies the route count, the
+event protocol, and — against an independent itertools enumeration — that
+the reported best route is the true optimum.
 """
 
 import itertools
 import random
 import unittest
 
-from src.services import bruteforce_service
-from src.utils.tsp_math import build_distance_matrix, route_distance, tour_distance
+from src.solvers.bruteforce import bruteforce_service
+from src.solvers.common.tsp_math import build_distance_matrix, route_distance, tour_distance
 
 
 def _make_cities(n, seed=1):

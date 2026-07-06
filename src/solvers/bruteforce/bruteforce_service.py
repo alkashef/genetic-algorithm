@@ -1,19 +1,19 @@
 """
-src/services/bruteforce_service.py
+src/solvers/bruteforce/bruteforce_service.py
 
 Brute-force TSP solver: enumerates every distinct route via Heap's algorithm.
 The start city is fixed and mirror-image routes are skipped, so the number of
 routes explored is (n-1)!/2. Runs as a generator yielding event dicts so the
 route layer can stream progress to the browser; iteration stops cleanly (via
 GeneratorExit) when the client disconnects.
-Does NOT handle HTTP — see src/routes/bruteforce_routes.py.
+Does NOT handle HTTP — see src/api/bruteforce_routes.py.
 """
 
 import math
 import time
 
 from src.config import BF_PROGRESS_INTERVAL_SECONDS
-from src.utils.tsp_math import build_distance_matrix, route_distance
+from src.solvers.common.tsp_math import build_distance_matrix, route_distance
 
 
 def count_routes(n: int) -> int:

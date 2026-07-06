@@ -1,10 +1,10 @@
 """
-src/utils/tsp_math.py
+src/solvers/common/tsp_math.py
 
-Pure geometry helpers for the Traveling Salesman Problem.
-Cities are dicts {"x": float, "y": float} in normalized [0, 1] space so the
-same set renders at correct relative positions on any canvas size.
-Does NOT contain solver logic — see src/services/.
+Pure geometry helpers for the Traveling Salesman Problem, shared by every
+solver. Cities are dicts {"x": float, "y": float} in normalized [0, 1] space
+so the same set renders at correct relative positions on any canvas size.
+Does NOT contain solver logic — see src/solvers/ga/ and src/solvers/bruteforce/.
 """
 
 import math
