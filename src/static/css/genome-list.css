@@ -1,7 +1,8 @@
 /* ============================================================
-   genome-list.css — GA population table: sticky filterable
-   header, gene cells with crossover/mutation highlights, elite/
-   selected row flags, and the legend below it.
+   genome-list.css — GA population tables: the side-by-side
+   current-generation/children columns, sticky filterable header,
+   gene cells with crossover/mutation highlights, elite/selected
+   row flags, and the legend below them.
    Does NOT style the stat cards beside it — see solver-view.css.
    ============================================================ */
 
@@ -9,16 +10,43 @@
   display: flex;
   align-items: baseline;
   gap: 0.6rem;
-  margin: 1.5rem 0 0.6rem;
+  margin: 1rem 0 0.6rem;
 }
 
 .genomes-title h3 { margin: 0; font-size: 1rem; }
 
-.genomes-title .sub {
-  font-size: 0.78rem;
+.genome-tables {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.genome-table-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.genome-col-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.genome-col-title .sub {
+  font-size: 0.72rem;
+  font-weight: 400;
   color: var(--muted);
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .genome-tables {
+    flex-direction: column;
+  }
 }
 
 .genome-table-wrap {

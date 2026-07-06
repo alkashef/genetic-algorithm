@@ -91,81 +91,129 @@
     <!-- ============ GENETIC ALGORITHM ============ -->
     <section id="ga" class="panel tab-panel">
       <h2>Genetic Algorithm</h2>
-      <div class="controls ga-params">
-        <label class="inline">Population
-          <input type="number" id="gaPopSize" min="4" max="2000" value="120" />
-        </label>
-        <label class="inline">Max generations
-          <input type="number" id="gaMaxGen" min="1" max="100000" value="400" />
-        </label>
-        <label class="inline">Crossover rate
-          <input type="number" id="gaCrossoverRate" min="0" max="1" step="0.05" value="0.9" />
-        </label>
-        <label class="inline">Mutation rate
-          <input type="number" id="gaMutationRate" min="0" max="1" step="0.01" value="0.02" />
-        </label>
-        <label class="inline">Selection
-          <select id="gaSelection">
-            <option value="tournament" selected>Tournament</option>
-            <option value="roulette">Roulette Wheel</option>
-          </select>
-        </label>
-        <label class="inline" id="gaTournamentSizeWrap">Tournament size
-          <input type="number" id="gaTournamentSize" min="2" max="50" value="5" />
-        </label>
-        <label class="inline"><input type="checkbox" id="gaElitism" checked /> Elitism</label>
-      </div>
-      <div class="controls">
-        <label class="inline">Step delay (seconds)
-          <input type="number" id="gaStepDelay" min="0" max="60" step="0.1" value="{{ default_step_delay }}" />
-        </label>
-        <div class="controls-buttons">
-          <button id="gaStepBtn">Initialize</button>
-          <button id="gaFastBtn">Fast forward</button>
-          <button id="gaResetBtn">Reset</button>
+
+      <div class="subsection">
+        <div class="subsection-title">Parameters</div>
+        <div class="controls ga-params">
+          <label class="inline">Population
+            <input type="number" id="gaPopSize" min="4" max="2000" value="120" />
+          </label>
+          <label class="inline">Genome length
+            <input type="number" id="gaGenomeLength" disabled />
+          </label>
+          <label class="inline">Max generations
+            <input type="number" id="gaMaxGen" min="1" max="100000" value="400" />
+          </label>
+          <label class="inline">Crossover rate
+            <input type="number" id="gaCrossoverRate" min="0" max="1" step="0.05" value="0.9" />
+          </label>
+          <label class="inline">Mutation rate
+            <input type="number" id="gaMutationRate" min="0" max="1" step="0.01" value="0.02" />
+          </label>
+          <label class="inline">Selection
+            <select id="gaSelection">
+              <option value="tournament" selected>Tournament</option>
+              <option value="roulette">Roulette Wheel</option>
+            </select>
+          </label>
+          <label class="inline" id="gaTournamentSizeWrap">Tournament size
+            <input type="number" id="gaTournamentSize" min="2" max="50" value="5" />
+          </label>
+          <label class="inline">Elite count
+            <input type="number" id="gaEliteCount" min="0" max="50" value="1" />
+          </label>
         </div>
       </div>
-      <p class="hint">Step through one phase at a time, or Fast forward to run automatically (paced by the step delay above).</p>
 
-      <div class="summary-card">
-        <div>
-          <div class="summary-label">Best distance ever</div>
-          <div class="summary-value" id="gaBestVal">&mdash;</div>
+      <div class="subsection">
+        <div class="subsection-title">Controls</div>
+        <div class="controls">
+          <label class="inline">Step delay (seconds)
+            <input type="number" id="gaStepDelay" min="0" max="60" step="0.1" value="{{ default_step_delay }}" />
+          </label>
+          <div class="controls-buttons">
+            <button id="gaStepBtn">Initialize</button>
+            <button id="gaFastBtn">Fast forward</button>
+            <button id="gaResetBtn">Reset</button>
+          </div>
         </div>
-        <div class="summary-caption">avg <span id="gaAvgVal">&mdash;</span></div>
+        <p class="hint">Step through one phase at a time, or Fast forward to run automatically (paced by the step delay above).</p>
       </div>
 
-      <div class="progress-row">
-        <div class="progress-track"><div class="progress-fill" id="gaProgressFill"></div></div>
-        <span class="progress-label" id="gaGenVal">0</span>
+      <div class="subsection">
+        <div class="subsection-title">Current</div>
+        <div class="progress-row">
+          <div class="progress-track"><div class="progress-fill" id="gaProgressFill"></div></div>
+          <span class="progress-label" id="gaGenVal">0</span>
+        </div>
+        <div class="mini-stats">
+          <div class="mini-stat"><div class="mini-stat-value" id="gaGenerationVal">0</div><div class="mini-stat-label">Generation</div></div>
+          <div class="mini-stat"><div class="mini-stat-value" id="gaAvgVal">&mdash;</div><div class="mini-stat-label">Avg distance</div></div>
+        </div>
+
+        <div class="genomes-title">
+          <h3>Population genomes</h3>
+        </div>
+        <div class="genome-tables">
+          <div class="genome-table-col">
+            <div class="genome-col-title">Current generation
+              <span class="sub">gen <span id="gaGenomeGen">0</span> &middot; <span id="gaGenomePop">0</span> individuals</span>
+            </div>
+            <div class="genome-table-wrap">
+              <table class="genome-table">
+                <thead>
+                  <tr>
+                    <th style="width:3rem">#</th>
+                    <th>Route</th>
+                    <th style="width:5.5rem">Distance</th>
+                    <th style="width:7rem">Flags</th>
+                  </tr>
+                  <tr class="filter-row">
+                    <th><input type="text" id="gaFilterIdx" placeholder="&hellip;" /></th>
+                    <th><input type="text" id="gaFilterRoute" placeholder="contains city #" /></th>
+                    <th><input type="text" id="gaFilterDist" placeholder="&hellip;" /></th>
+                    <th><input type="text" id="gaFilterFlags" placeholder="elite / selected" /></th>
+                  </tr>
+                </thead>
+                <tbody id="gaGenomeTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="genome-table-col">
+            <div class="genome-col-title">Children <span class="sub"><span id="gaGenomeChildrenCount">0</span> individuals</span></div>
+            <div class="genome-table-wrap">
+              <table class="genome-table">
+                <thead>
+                  <tr>
+                    <th style="width:3rem">#</th>
+                    <th>Route</th>
+                    <th style="width:7rem">Flags</th>
+                  </tr>
+                </thead>
+                <tbody id="gaGenomeTbodyChildren"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="genome-legend">
+          <span><span class="swatch crossover"></span> crossover segment</span>
+          <span><span class="swatch mutation"></span> mutation swap</span>
+        </div>
+
+        <div class="genomes-title">
+          <h3>Fitness</h3>
+        </div>
+        <div class="fitness-chart-wrap">
+          <canvas id="gaFitnessChart" height="220"></canvas>
+        </div>
       </div>
 
-      <div class="genomes-title">
-        <h3>Population genomes</h3>
-        <span class="sub">gen <span id="gaGenomeGen">0</span> &middot; <span id="gaGenomePop">0</span> individuals</span>
-      </div>
-      <div class="genome-table-wrap">
-        <table class="genome-table">
-          <thead>
-            <tr>
-              <th style="width:3rem">#</th>
-              <th>Route</th>
-              <th style="width:5.5rem">Distance</th>
-              <th style="width:7rem">Flags</th>
-            </tr>
-            <tr class="filter-row">
-              <th><input type="text" id="gaFilterIdx" placeholder="&hellip;" /></th>
-              <th><input type="text" id="gaFilterRoute" placeholder="contains city #" /></th>
-              <th><input type="text" id="gaFilterDist" placeholder="&hellip;" /></th>
-              <th><input type="text" id="gaFilterFlags" placeholder="elite / selected" /></th>
-            </tr>
-          </thead>
-          <tbody id="gaGenomeTbody"></tbody>
-        </table>
-      </div>
-      <div class="genome-legend">
-        <span><span class="swatch crossover"></span> crossover segment</span>
-        <span><span class="swatch mutation"></span> mutation swap</span>
+      <div class="subsection">
+        <div class="subsection-title">Best</div>
+        <div class="mini-stats">
+          <div class="mini-stat"><div class="mini-stat-value route-value best-value" id="gaBestRouteVal">&mdash;</div><div class="mini-stat-label">Best route</div></div>
+          <div class="mini-stat"><div class="mini-stat-value best-value" id="gaBestVal">&mdash;</div><div class="mini-stat-label">Best distance</div></div>
+        </div>
       </div>
     </section>
 

@@ -1,10 +1,14 @@
 /**
  * @module fitnessChart
- * @description Minimal canvas line chart of average tour distance per
- * generation. No chart libraries.
+ * @description Minimal canvas line chart of fitness (tour distance) per
+ * generation: the population average, on a gridded plot area. No chart
+ * libraries.
  */
 
 import { formatDistance } from "./format.js";
+
+const Y_TICK_COUNT = 4; // 5 labels, including both ends
+const X_TICK_COUNT = 6; // up to 7 labels, including both ends
 
 /**
  * Draw the full fitness chart, or a placeholder message when there is not
@@ -12,26 +16,42 @@ import { formatDistance } from "./format.js";
  *
  * @param {CanvasRenderingContext2D} ctx - Target context.
  * @param {HTMLCanvasElement} canvas - Canvas owning the context.
- * @param {number[]} avgHistory - Average distance per generation.
+ * @param {number[]} avgHistory - Average fitness (tour distance) per generation.
  * @returns {void}
  */
 export function drawFitnessChart(ctx, canvas, avgHistory) {
   const { width, height } = canvas;
   ctx.clearRect(0, 0, width, height);
-  const padding = { top: 20, right: 18, bottom: 46, left: 66 };
+  const padding = { top: 16, right: 16, bottom: 40, left: 60 };
   const plot = {
     w: width - padding.left - padding.right,
     h: height - padding.top - padding.bottom,
   };
+  drawPlotBackground(ctx, padding, plot);
   if (avgHistory.length < 2) {
     drawPlaceholder(ctx, padding, height);
     return;
   }
   const scale = makeScale(avgHistory, padding, plot);
+  drawGrid(ctx, scale, padding, plot);
   drawAxes(ctx, padding, plot);
-  drawTicksAndTitles(ctx, scale, padding, plot, width, height);
+  drawTickLabels(ctx, scale, padding, plot);
+  drawAxisTitles(ctx, padding, plot, width, height);
   drawSeries(ctx, avgHistory, scale, "#e2692a");
   drawLegend(ctx, padding);
+}
+
+/**
+ * Fill the plot area with a light-grey background.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Target context.
+ * @param {{top: number, left: number}} padding - Plot padding.
+ * @param {{w: number, h: number}} plot - Plot dimensions.
+ * @returns {void}
+ */
+function drawPlotBackground(ctx, padding, plot) {
+  ctx.fillStyle = "#eef1f6";
+  ctx.fillRect(padding.left, padding.top, plot.w, plot.h);
 }
 
 /**
@@ -45,26 +65,70 @@ export function drawFitnessChart(ctx, canvas, avgHistory) {
 function drawPlaceholder(ctx, padding, height) {
   ctx.fillStyle = "#667085";
   ctx.font = "12px monospace";
-  ctx.fillText("Fitness chart will appear once the GA is running.", padding.left, height / 2);
+  ctx.fillText("Fitness chart will appear once the GA is running.", padding.left + 10, height / 2);
 }
 
 /**
- * Build the value→pixel mapping for both axes.
+ * Build the value→pixel mapping for both axes, plus the tick positions to
+ * draw as gridlines and labels.
  *
- * @param {number[]} avgHistory - Average distance per generation.
+ * @param {number[]} avgHistory - Average fitness per generation.
  * @param {{top: number, left: number}} padding - Plot padding.
  * @param {{w: number, h: number}} plot - Plot dimensions.
- * @returns {{x: (i: number) => number, y: (v: number) => number, maxVal: number}} Scale functions.
+ * @returns {{x: (i: number) => number, y: (v: number) => number,
+ *   yTicks: number[], xTicks: number[]}} Scale functions and tick positions.
  */
 function makeScale(avgHistory, padding, plot) {
   const maxVal = Math.max(...avgHistory);
   const minVal = Math.min(...avgHistory);
   const range = maxVal - minVal || 1;
+  const n = avgHistory.length;
+
+  const yTicks = [];
+  for (let i = 0; i <= Y_TICK_COUNT; i++) {
+    yTicks.push(minVal + (range * i) / Y_TICK_COUNT);
+  }
+
+  const xTickCount = Math.min(X_TICK_COUNT, n - 1);
+  const xTicks = [];
+  for (let i = 0; i <= xTickCount; i++) {
+    xTicks.push(Math.round((i / xTickCount) * (n - 1)));
+  }
+
   return {
-    x: (i) => padding.left + (i / (avgHistory.length - 1)) * plot.w,
+    x: (i) => padding.left + (i / (n - 1)) * plot.w,
     y: (v) => padding.top + (1 - (v - minVal) / range) * plot.h,
-    maxVal,
+    yTicks,
+    xTicks,
   };
+}
+
+/**
+ * Draw the white gridline mesh at every tick position.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Target context.
+ * @param {{x: Function, y: Function, yTicks: number[], xTicks: number[]}} scale - Value scale.
+ * @param {{top: number, left: number}} padding - Plot padding.
+ * @param {{w: number, h: number}} plot - Plot dimensions.
+ * @returns {void}
+ */
+function drawGrid(ctx, scale, padding, plot) {
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 1;
+  for (const v of scale.yTicks) {
+    const y = Math.round(scale.y(v)) + 0.5;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(padding.left + plot.w, y);
+    ctx.stroke();
+  }
+  for (const idx of scale.xTicks) {
+    const x = Math.round(scale.x(idx)) + 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x, padding.top);
+    ctx.lineTo(x, padding.top + plot.h);
+    ctx.stroke();
+  }
 }
 
 /**
@@ -86,34 +150,51 @@ function drawAxes(ctx, padding, plot) {
 }
 
 /**
- * Draw the boundary tick labels and the axis titles.
+ * Draw the numeric tick labels along both axes.
  *
  * @param {CanvasRenderingContext2D} ctx - Target context.
- * @param {{maxVal: number}} scale - Value scale.
+ * @param {{x: Function, y: Function, yTicks: number[], xTicks: number[]}} scale - Value scale.
+ * @param {{top: number, left: number}} padding - Plot padding.
+ * @param {{w: number, h: number}} plot - Plot dimensions.
+ * @returns {void}
+ */
+function drawTickLabels(ctx, scale, padding, plot) {
+  ctx.fillStyle = "#667085";
+  ctx.font = "10px monospace";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  for (const v of scale.yTicks) {
+    ctx.fillText(formatDistance(v), padding.left - 8, scale.y(v));
+  }
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  for (const idx of scale.xTicks) {
+    ctx.fillText(String(idx), scale.x(idx), padding.top + plot.h + 14);
+  }
+}
+
+/**
+ * Draw the X and Y axis titles.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Target context.
  * @param {{top: number, left: number}} padding - Plot padding.
  * @param {{w: number, h: number}} plot - Plot dimensions.
  * @param {number} width - Canvas width.
  * @param {number} height - Canvas height.
  * @returns {void}
  */
-function drawTicksAndTitles(ctx, scale, padding, plot, width, height) {
-  ctx.fillStyle = "#667085";
-  ctx.font = "10px monospace";
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
-  ctx.fillText(formatDistance(scale.maxVal), padding.left - 8, padding.top);
-  ctx.textAlign = "center";
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText("0", padding.left, padding.top + plot.h + 14);
+function drawAxisTitles(ctx, padding, plot, width, height) {
   ctx.fillStyle = "#1a2235";
   ctx.font = "11px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
   ctx.fillText("Generation", padding.left + plot.w / 2, height - 6);
   ctx.save();
   ctx.translate(14, padding.top + plot.h / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("Distance", 0, 0);
+  ctx.fillText("Fitness", 0, 0);
   ctx.restore();
 }
 

@@ -107,11 +107,12 @@ def select_parents(population: list, distances: list, params: SelectionParams) -
         params (SelectionParams): Selection strategy configuration.
 
     Returns:
-        tuple: (pairs, elite_idx) where pairs is a list of [a_idx, b_idx]
-            and elite_idx is the surviving individual's index or None.
+        tuple: (pairs, elite_indices) where pairs is a list of [a_idx, b_idx]
+            and elite_indices is the list of surviving individuals' indices
+            (empty when params.elite_count is 0).
     """
-    elite_idx = _find_elite_index(distances) if params.elitism else None
-    pair_count = len(population) - (1 if params.elitism else 0)
+    elite_indices = _find_elite_indices(distances, params.elite_count)
+    pair_count = len(population) - len(elite_indices)
 
     if params.selection == "roulette":
         selected_pairs = _select_with_roulette(population, distances, pair_count)
@@ -121,17 +122,17 @@ def select_parents(population: list, distances: list, params: SelectionParams) -
         )
 
     pairs = [[selected_pairs[i][0], selected_pairs[i][1]] for i in range(pair_count)]
-    return pairs, elite_idx
+    return pairs, elite_indices
 
 
-def crossover_stage(population: list, pairs: list, elite_idx, crossover_rate: float) -> tuple:
+def crossover_stage(population: list, pairs: list, elite_indices: list, crossover_rate: float) -> tuple:
     """
     Breed each parent pair with DEAP's order crossover (subject to crossover_rate).
 
     Args:
         population (list): Current population.
         pairs (list): Parent index pairs from select_parents().
-        elite_idx (int | None): Index of the elite individual, or None.
+        elite_indices (list): Indices of the elite individuals, in survival order.
         crossover_rate (float): Probability in [0, 1] that a pair breeds.
 
     Returns:
@@ -139,8 +140,8 @@ def crossover_stage(population: list, pairs: list, elite_idx, crossover_rate: fl
             {"elite": bool, "crossover": {"start", "end"} | None, "mutation": None}.
     """
     children, trace = [], []
-    if elite_idx is not None:
-        children.append(list(population[elite_idx]))
+    for idx in elite_indices or []:
+        children.append(list(population[idx]))
         trace.append({"elite": True, "crossover": None, "mutation": None})
 
     for ai, bi in pairs:
@@ -180,17 +181,20 @@ def mutate_stage(children: list, trace: list, mutation_rate: float) -> tuple:
     return children, trace
 
 
-def _find_elite_index(distances: list) -> int:
+def _find_elite_indices(distances: list, count: int) -> list:
     """
-    Locate the individual with the shortest tour.
+    Locate the individuals with the shortest tours.
 
     Args:
         distances (list): Tour distance per individual.
+        count (int): Number of top individuals to return; 0 yields none.
 
     Returns:
-        int: Index of the minimum distance.
+        list: Indices of the `count` smallest distances, best first.
     """
-    return min(range(len(distances)), key=lambda i: distances[i])
+    if count <= 0:
+        return []
+    return sorted(range(len(distances)), key=lambda i: distances[i])[:count]
 
 
 def _select_with_tournament(

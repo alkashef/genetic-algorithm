@@ -48,12 +48,12 @@ export async function evaluatePopulation(population, cities) {
 }
 
 /**
- * Pick the parent pairs (and elite) that breed the next generation.
+ * Pick the parent pairs (and elites) that breed the next generation.
  *
  * @param {number[][]} population - Current population.
  * @param {number[]} distances - Distance per individual.
- * @param {{selection: string, tournamentSize: number, elitism: boolean}} params - Selection settings.
- * @returns {Promise<{pairs: number[][], eliteIdx: number | null}>} Selection result.
+ * @param {{selection: string, tournamentSize: number, eliteCount: number}} params - Selection settings.
+ * @returns {Promise<{pairs: number[][], eliteIndices: number[]}>} Selection result.
  */
 export async function selectParents(population, distances, params) {
   return postJson("/api/ga/select", { population, distances, params });
@@ -64,12 +64,12 @@ export async function selectParents(population, distances, params) {
  *
  * @param {number[][]} population - Current population.
  * @param {number[][]} pairs - Parent index pairs.
- * @param {number | null} eliteIdx - Elite individual's index, or null.
+ * @param {number[]} eliteIndices - Indices of the elite individuals.
  * @param {number} crossoverRate - Probability in [0,1] that a pair breeds.
  * @returns {Promise<{children: number[][], trace: object[]}>} Children plus per-child trace.
  */
-export async function crossoverStage(population, pairs, eliteIdx, crossoverRate) {
-  return postJson("/api/ga/crossover", { population, pairs, eliteIdx, crossoverRate });
+export async function crossoverStage(population, pairs, eliteIndices, crossoverRate) {
+  return postJson("/api/ga/crossover", { population, pairs, eliteIndices, crossoverRate });
 }
 
 /**

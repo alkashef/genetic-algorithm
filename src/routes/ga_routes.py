@@ -43,15 +43,15 @@ def evaluate():
 @ga_bp.post("/select")
 def select():
     """
-    Pick parent pairs (and the elite, if enabled) for breeding.
+    Pick parent pairs (and elites, if enabled) for breeding.
 
     Returns:
-        Response: JSON {"pairs": [[int, int], ...], "eliteIdx": int | null}.
+        Response: JSON {"pairs": [[int, int], ...], "eliteIndices": [int, ...]}.
     """
     data = request.get_json()
     params = SelectionParams.from_dict(data["params"])
-    pairs, elite_idx = ga_service.select_parents(data["population"], data["distances"], params)
-    return jsonify({"pairs": pairs, "eliteIdx": elite_idx})
+    pairs, elite_indices = ga_service.select_parents(data["population"], data["distances"], params)
+    return jsonify({"pairs": pairs, "eliteIndices": elite_indices})
 
 
 @ga_bp.post("/crossover")
@@ -64,7 +64,7 @@ def crossover():
     """
     data = request.get_json()
     children, trace = ga_service.crossover_stage(
-        data["population"], data["pairs"], data["eliteIdx"], data["crossoverRate"]
+        data["population"], data["pairs"], data["eliteIndices"], data["crossoverRate"]
     )
     return jsonify({"children": children, "trace": trace})
 

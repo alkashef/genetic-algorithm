@@ -17,12 +17,13 @@ class SelectionParams:
     Attributes:
         selection (str): Selection strategy, "tournament" or "roulette".
         tournament_size (int): Candidates drawn per tournament round.
-        elitism (bool): Whether the best individual survives unchanged.
+        elite_count (int): Number of top individuals that survive unchanged
+            into the next generation; 0 disables elitism.
     """
 
     selection: str
     tournament_size: int
-    elitism: bool
+    elite_count: int
 
     @classmethod
     def from_dict(cls, data: dict) -> "SelectionParams":
@@ -30,7 +31,7 @@ class SelectionParams:
         Build a SelectionParams from a request-payload dict.
 
         Args:
-            data (dict): Keys "selection", "tournamentSize", "elitism"
+            data (dict): Keys "selection", "tournamentSize", "eliteCount"
                 (missing keys fall back to tournament selection defaults).
 
         Returns:
@@ -39,5 +40,5 @@ class SelectionParams:
         return cls(
             selection=data.get("selection", "tournament"),
             tournament_size=int(data.get("tournamentSize", 3)),
-            elitism=bool(data.get("elitism", False)),
+            elite_count=int(data.get("eliteCount", 0)),
         )

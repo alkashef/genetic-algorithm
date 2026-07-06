@@ -26,8 +26,7 @@ and its fitness history — against the known optimum.
 ├── config/
 │   ├── .env                       # Environment variables (local only, never committed)
 │   └── .env.example               # Committed template with all keys, no values
-├── data/                          # Data files (currently empty)
-├── docs/                          # Project documentation (ga_learning_guide.html)
+├── docs/                          # Project documentation (design.md, plan.md, ga_learning_guide.html)
 ├── src/
 │   ├── config.py                  # Sole reader of config/.env; exports typed constants
 │   ├── routes/
@@ -82,7 +81,7 @@ evolution stage:
 | --- | --- |
 | `POST /api/ga/init` | Build the initial random population |
 | `POST /api/ga/evaluate` | Compute each tour's distance (fitness) |
-| `POST /api/ga/select` | Pick parent pairs (tournament / roulette) + elite |
+| `POST /api/ga/select` | Pick parent pairs (tournament / roulette) + elites |
 | `POST /api/ga/crossover` | Order Crossover (OX) breeding, with per-genome trace |
 | `POST /api/ga/mutate` | Swap mutation, with per-genome trace |
 | `POST /api/bruteforce` | Stream every route + running best (NDJSON); client abort cancels |
@@ -91,8 +90,9 @@ evolution stage:
 
 **Genetic algorithm** — implemented with DEAP framework; permutation encoding;
 tournament (configurable size) or roulette-wheel selection; Order Crossover (OX),
-which preserves relative city order; swap mutation; optional elitism. Fitness is
-the closed-tour distance (minimized). Evolution is split into discrete stages
+which preserves relative city order; swap mutation; configurable elite count (top
+N individuals carried over unchanged; 0 disables elitism). Fitness is the
+closed-tour distance (minimized). Evolution is split into discrete stages
 (init, evaluate, select, crossover, mutate) so the frontend can step through
 and visualize each one.
 
@@ -117,5 +117,5 @@ search that it finds the true optimum.
 - **3–12 cities**: run brute force for the global optimum, then compare the GA
 - **13+ cities**: use the GA only (brute force grows factorially)
 - Tuning: higher mutation for exploration, higher crossover to exploit good
-  solutions, smaller tournaments (3–5) for diversity, elitism on to never lose
-  the best tour
+  solutions, smaller tournaments (3–5) for diversity, elite count ≥ 1 to never
+  lose the best tour

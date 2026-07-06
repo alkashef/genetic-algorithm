@@ -69,21 +69,28 @@ class TestSelectParents(unittest.TestCase):
 
     def test_tournament_with_elitism(self):
         """Elitism reserves one slot and returns the best individual."""
-        params = SelectionParams(selection="tournament", tournament_size=3, elitism=True)
-        pairs, elite_idx = ga_service.select_parents(self.population, self.distances, params)
-        self.assertEqual(elite_idx, 3)  # index of min distance 1.0
+        params = SelectionParams(selection="tournament", tournament_size=3, elite_count=1)
+        pairs, elite_indices = ga_service.select_parents(self.population, self.distances, params)
+        self.assertEqual(elite_indices, [3])  # index of min distance 1.0
         self.assertEqual(len(pairs), len(self.population) - 1)
 
+    def test_tournament_with_multiple_elites(self):
+        """Elite count > 1 reserves that many slots, best distances first."""
+        params = SelectionParams(selection="tournament", tournament_size=3, elite_count=3)
+        pairs, elite_indices = ga_service.select_parents(self.population, self.distances, params)
+        self.assertEqual(elite_indices, [3, 5, 1])  # distances 1.0, 2.0, 3.0
+        self.assertEqual(len(pairs), len(self.population) - 3)
+
     def test_tournament_without_elitism(self):
-        """Without elitism there is no elite and a full set of pairs."""
-        params = SelectionParams(selection="tournament", tournament_size=3, elitism=False)
-        pairs, elite_idx = ga_service.select_parents(self.population, self.distances, params)
-        self.assertIsNone(elite_idx)
+        """With elite_count 0 there are no elites and a full set of pairs."""
+        params = SelectionParams(selection="tournament", tournament_size=3, elite_count=0)
+        pairs, elite_indices = ga_service.select_parents(self.population, self.distances, params)
+        self.assertEqual(elite_indices, [])
         self.assertEqual(len(pairs), len(self.population))
 
     def test_roulette_indices_in_range(self):
         """Roulette selection only produces valid population indices."""
-        params = SelectionParams(selection="roulette", tournament_size=3, elitism=False)
+        params = SelectionParams(selection="roulette", tournament_size=3, elite_count=0)
         pairs, _ = ga_service.select_parents(self.population, self.distances, params)
         for a, b in pairs:
             self.assertIn(a, range(len(self.population)))
@@ -100,20 +107,29 @@ class TestCrossoverStage(unittest.TestCase):
 
     def test_children_are_valid_permutations(self):
         """Order crossover must never duplicate or drop a gene."""
-        children, _ = ga_service.crossover_stage(self.population, self.pairs, 0, 1.0)
+        children, _ = ga_service.crossover_stage(self.population, self.pairs, [0], 1.0)
         for child in children:
             self.assertEqual(sorted(child), list(range(8)))
 
     def test_elite_copied_first_with_trace(self):
         """The elite is child zero and its trace row is marked elite."""
-        children, trace = ga_service.crossover_stage(self.population, self.pairs, 4, 0.5)
+        children, trace = ga_service.crossover_stage(self.population, self.pairs, [4], 0.5)
         self.assertEqual(children[0], self.population[4])
         self.assertTrue(trace[0]["elite"])
         self.assertIsNone(trace[0]["crossover"])
 
+    def test_multiple_elites_copied_first_in_order(self):
+        """Every elite index is copied first, in the given order, before any bred child."""
+        children, trace = ga_service.crossover_stage(self.population, self.pairs, [4, 2], 0.5)
+        self.assertEqual(children[0], self.population[4])
+        self.assertEqual(children[1], self.population[2])
+        self.assertTrue(trace[0]["elite"])
+        self.assertTrue(trace[1]["elite"])
+        self.assertFalse(trace[2]["elite"])
+
     def test_zero_rate_copies_parent_a(self):
         """With crossover rate 0 every child is a copy of parent A."""
-        children, trace = ga_service.crossover_stage(self.population, self.pairs, None, 0.0)
+        children, trace = ga_service.crossover_stage(self.population, self.pairs, [], 0.0)
         for k, (ai, _) in enumerate(self.pairs):
             self.assertEqual(children[k], self.population[ai])
             self.assertIsNone(trace[k]["crossover"])
@@ -126,7 +142,7 @@ class TestMutateStage(unittest.TestCase):
         """Children and trace produced by a crossover with an elite."""
         self.population = ga_service.init_population(10, 8)
         pairs = [[i, (i + 1) % 10] for i in range(9)]
-        self.children, self.trace = ga_service.crossover_stage(self.population, pairs, 0, 1.0)
+        self.children, self.trace = ga_service.crossover_stage(self.population, pairs, [0], 1.0)
 
     def test_elite_never_mutated(self):
         """Even at mutation rate 1 the elite child is untouched."""

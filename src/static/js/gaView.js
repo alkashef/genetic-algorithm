@@ -1,27 +1,29 @@
 /**
  * @module gaView
  * @description Owns the genetic-algorithm section: parameter inputs, the
- * phase-step / fast-forward / reset buttons, stat cards, board canvas,
- * fitness chart, and the genome table. Drives the evolution one phase per
- * backend call (init → fitness → select → crossover → mutate → fitness …).
- * All DOM access for that section lives here.
+ * phase-step / fast-forward / reset buttons, stat cards, board canvas, the
+ * side-by-side current-generation / children genome tables, and the fitness
+ * chart. Drives the evolution one phase per backend call (init → fitness →
+ * select → crossover → mutate → fitness …). All DOM access for that section
+ * lives here.
  */
 
 import { initPopulation, evaluatePopulation, selectParents, crossoverStage, mutateStage } from "./api.js";
 import { getCities } from "./cityState.js";
 import { clearCanvas, drawCities, drawTour, drawGrid } from "./canvasUtils.js";
 import { onCitiesChanged } from "./events.js";
-import { formatDistance } from "./format.js";
+import { formatDistance, formatRoute } from "./format.js";
+import { drawFitnessChart } from "./fitnessChart.js";
 import { genomeRenderCap, minCities } from "./uiConfig.js";
 
 const state = {
   population: [],
   distances: [],
-  trace: null,        // per-genome crossover/mutation info for the shown genomes
-  display: [],        // genomes currently rendered (population, or children mid-breeding)
+  trace: null,        // per-genome crossover/mutation info; belongs to state.children
+                       // while they exist, and to state.population once mutate promotes them
   selectedSet: null,  // row indices highlighted as selected parents (select phase)
   children: null,     // children being built across crossover/mutate phases
-  selected: null,     // { pairs, eliteIdx } from the select phase
+  selected: null,     // { pairs, eliteIndices } from the select phase
   phase: "init",      // next phase to run
   generation: 0,
   avgHistory: [],
@@ -51,6 +53,9 @@ export function initGaView() {
   refs.filterFlags.addEventListener("input", () => updateGenomeFilter("flags", refs.filterFlags.value));
   onCitiesChanged(reset);
   updateSelectionVisibility();
+  // The GA tab starts hidden (display:none), so its width is 0 until the tab
+  // is opened; re-stretch the canvas once that resize actually happens.
+  new ResizeObserver(redrawFitnessChart).observe(refs.fitnessCanvas.parentElement);
 }
 
 /**
@@ -66,18 +71,25 @@ function grabRefs() {
   refs.selection = document.getElementById("gaSelection");
   refs.tournamentSizeWrap = document.getElementById("gaTournamentSizeWrap");
   refs.tournamentSize = document.getElementById("gaTournamentSize");
-  refs.elitism = document.getElementById("gaElitism");
+  refs.eliteCount = document.getElementById("gaEliteCount");
+  refs.genomeLength = document.getElementById("gaGenomeLength");
   refs.stepBtn = document.getElementById("gaStepBtn");
   refs.fastBtn = document.getElementById("gaFastBtn");
   refs.resetBtn = document.getElementById("gaResetBtn");
   refs.genVal = document.getElementById("gaGenVal");
   refs.progressFill = document.getElementById("gaProgressFill");
+  refs.generationVal = document.getElementById("gaGenerationVal");
   refs.bestVal = document.getElementById("gaBestVal");
+  refs.bestRouteVal = document.getElementById("gaBestRouteVal");
   refs.avgVal = document.getElementById("gaAvgVal");
   refs.stepDelay = document.getElementById("gaStepDelay");
   refs.genomeTbody = document.getElementById("gaGenomeTbody");
   refs.genomeGen = document.getElementById("gaGenomeGen");
   refs.genomePop = document.getElementById("gaGenomePop");
+  refs.genomeTbodyChildren = document.getElementById("gaGenomeTbodyChildren");
+  refs.genomeChildrenCount = document.getElementById("gaGenomeChildrenCount");
+  refs.fitnessCanvas = document.getElementById("gaFitnessChart");
+  refs.fitnessCtx = refs.fitnessCanvas.getContext("2d");
   refs.filterIdx = document.getElementById("gaFilterIdx");
   refs.filterRoute = document.getElementById("gaFilterRoute");
   refs.filterDist = document.getElementById("gaFilterDist");
@@ -100,7 +112,7 @@ function updateSelectionVisibility() {
  *
  * @returns {{popSize: number, maxGen: number, crossoverRate: number,
  *   mutationRate: number, selection: string, tournamentSize: number,
- *   elitism: boolean}} The validated parameters.
+ *   eliteCount: number}} The validated parameters.
  */
 function getParams() {
   return {
@@ -110,7 +122,7 @@ function getParams() {
     mutationRate: Math.min(1, Math.max(0, parseFloat(refs.mutationRate.value) || 0)),
     selection: refs.selection.value,
     tournamentSize: Math.max(Number(refs.tournamentSize.min), parseInt(refs.tournamentSize.value, 10) || 2),
-    elitism: refs.elitism.checked,
+    eliteCount: Math.max(Number(refs.eliteCount.min), parseInt(refs.eliteCount.value, 10) || 0),
   };
 }
 
@@ -122,15 +134,18 @@ function getParams() {
 function reset() {
   stopFast();
   Object.assign(state, {
-    population: [], distances: [], trace: null, display: [],
+    population: [], distances: [], trace: null,
     selectedSet: null, children: null, selected: null,
     phase: "init", generation: 0, avgHistory: [], bestEver: null,
     genomeFilters: { idx: "", route: "", dist: "", flags: "" },
   });
+  refs.genomeLength.value = getCities().length;
+  redrawFitnessChart();
   const tooFew = getCities().length < minCities();
   refs.stepBtn.disabled = tooFew;
   refs.fastBtn.disabled = tooFew;
   refs.bestVal.textContent = "—";
+  refs.bestRouteVal.textContent = "—";
   refs.avgVal.textContent = "—";
   refs.filterIdx.value = "";
   refs.filterRoute.value = "";
@@ -173,7 +188,6 @@ async function phaseInit() {
     distances: [], trace: null, selectedSet: null, children: null, selected: null,
     generation: 0, avgHistory: [], bestEver: null,
   });
-  state.display = state.population;
 }
 
 /**
@@ -186,11 +200,10 @@ async function phaseFitness() {
   recordStats();
   state.trace = null;
   state.selectedSet = null;
-  state.display = state.population;
 }
 
 /**
- * Phase: pick parent pairs (and elite) and highlight the selected rows.
+ * Phase: pick parent pairs (and elites) and highlight the selected rows.
  *
  * @returns {Promise<void>} Resolves when the selection is stored.
  */
@@ -198,10 +211,9 @@ async function phaseSelect() {
   state.selected = await selectParents(state.population, state.distances, getParams());
   const set = new Set();
   for (const [a, b] of state.selected.pairs) { set.add(a); set.add(b); }
-  if (state.selected.eliteIdx != null) set.add(state.selected.eliteIdx);
+  for (const idx of state.selected.eliteIndices) set.add(idx);
   state.selectedSet = set;
   state.trace = null;
-  state.display = state.population;
 }
 
 /**
@@ -210,12 +222,11 @@ async function phaseSelect() {
  * @returns {Promise<void>} Resolves when the children are stored.
  */
 async function phaseCrossover() {
-  const { pairs, eliteIdx } = state.selected;
-  const res = await crossoverStage(state.population, pairs, eliteIdx, getParams().crossoverRate);
+  const { pairs, eliteIndices } = state.selected;
+  const res = await crossoverStage(state.population, pairs, eliteIndices, getParams().crossoverRate);
   state.children = res.children;
   state.trace = res.trace;
   state.selectedSet = null;
-  state.display = res.children;
 }
 
 /**
@@ -229,7 +240,6 @@ async function phaseMutate() {
   state.trace = res.trace;
   state.children = null;
   state.generation++;
-  state.display = state.population;
 }
 
 /**
@@ -310,7 +320,7 @@ function updatePhaseButton() {
 }
 
 /**
- * Refresh the summary card, progress bar, board, and genome table.
+ * Refresh the stat cards, progress bar, board, and genome tables.
  *
  * @returns {void}
  */
@@ -318,9 +328,21 @@ function updateUI() {
   const avg = state.avgHistory[state.avgHistory.length - 1];
   updateGenProgress();
   refs.bestVal.textContent = state.bestEver ? formatDistance(state.bestEver.dist) : "—";
+  refs.bestRouteVal.textContent = state.bestEver ? formatRoute(state.bestEver.order) : "—";
   refs.avgVal.textContent = avg != null ? formatDistance(avg) : "—";
   redrawBoard();
   renderGenomes();
+  redrawFitnessChart();
+}
+
+/**
+ * Stretch the fitness canvas to its wrapper's full width, then redraw it.
+ *
+ * @returns {void}
+ */
+function redrawFitnessChart() {
+  refs.fitnessCanvas.width = refs.fitnessCanvas.parentElement.clientWidth;
+  drawFitnessChart(refs.fitnessCtx, refs.fitnessCanvas, state.avgHistory);
 }
 
 /**
@@ -333,6 +355,7 @@ function updateGenProgress() {
   const pct = maxGen > 0 ? Math.min(100, (state.generation / maxGen) * 100) : 0;
   refs.progressFill.style.width = `${pct}%`;
   refs.genVal.textContent = `${state.generation.toLocaleString()} / ${maxGen.toLocaleString()}`;
+  refs.generationVal.textContent = state.generation.toLocaleString();
 }
 
 /**
@@ -349,14 +372,27 @@ function redrawBoard() {
 }
 
 /**
- * Render the displayed genomes as table rows, highlighting crossover
- * segments, mutation swaps, elite rows, and selected parents, honoring the
- * active column filters. Rows beyond the configured cap are summarized.
+ * Render both genome tables: the current generation (left, filterable) and
+ * its children being bred (right). Trace (crossover/mutation/elite) belongs
+ * to whichever array it currently describes — the children while they
+ * exist, or the population once mutate() has promoted them.
  *
  * @returns {void}
  */
 function renderGenomes() {
-  const genomes = state.display || [];
+  renderCurrentTable(state.children ? null : state.trace);
+  renderChildrenTable(state.trace);
+}
+
+/**
+ * Render the current-generation table, honoring the active column filters.
+ * Rows beyond the configured cap are summarized.
+ *
+ * @param {object[] | null} trace - Per-genome trace, or null if inapplicable.
+ * @returns {void}
+ */
+function renderCurrentTable(trace) {
+  const genomes = state.population;
   refs.genomeGen.textContent = state.generation.toLocaleString();
   refs.genomePop.textContent = genomes.length.toLocaleString();
   if (genomes.length === 0) {
@@ -365,17 +401,43 @@ function renderGenomes() {
   }
   const cap = genomeRenderCap();
   const shown = Math.min(genomes.length, cap);
-  const distancesValid = state.display === state.population && state.distances.length === state.display.length;
+  const distancesValid = state.distances.length === genomes.length;
   const rows = [];
   for (let k = 0; k < shown; k++) {
     const dist = distancesValid ? state.distances[k] : null;
-    const row = buildGenomeRow(genomes[k], state.trace ? state.trace[k] : null, k, dist);
+    const row = buildGenomeRow(genomes[k], trace ? trace[k] : null, k, dist, state.selectedSet, true);
     if (matchesGenomeFilters(row.search)) rows.push(row.html);
   }
   if (genomes.length > shown) {
     rows.push(`<tr><td colspan="4" class="genome-more">… ${(genomes.length - shown).toLocaleString()} more not shown</td></tr>`);
   }
   refs.genomeTbody.innerHTML = rows.join("");
+}
+
+/**
+ * Render the children table (the next generation being bred). Unfiltered —
+ * empty until the crossover phase produces children for this generation.
+ *
+ * @param {object[] | null} trace - Per-genome trace, or null if inapplicable.
+ * @returns {void}
+ */
+function renderChildrenTable(trace) {
+  const genomes = state.children || [];
+  refs.genomeChildrenCount.textContent = genomes.length.toLocaleString();
+  if (genomes.length === 0) {
+    refs.genomeTbodyChildren.innerHTML = "";
+    return;
+  }
+  const cap = genomeRenderCap();
+  const shown = Math.min(genomes.length, cap);
+  const rows = [];
+  for (let k = 0; k < shown; k++) {
+    rows.push(buildGenomeRow(genomes[k], trace ? trace[k] : null, k, null, null, false).html);
+  }
+  if (genomes.length > shown) {
+    rows.push(`<tr><td colspan="3" class="genome-more">… ${(genomes.length - shown).toLocaleString()} more not shown</td></tr>`);
+  }
+  refs.genomeTbodyChildren.innerHTML = rows.join("");
 }
 
 /**
@@ -386,9 +448,11 @@ function renderGenomes() {
  * @param {{elite: boolean, crossover: object | null, mutation: object | null} | null} t - Trace entry.
  * @param {number} rowIndex - Row position, used for the selected highlight.
  * @param {number | null} dist - The genome's distance, or null if not yet known.
+ * @param {Set<number> | null} selectedSet - Row indices to flag as selected, if any.
+ * @param {boolean} showDist - Whether to render the Distance column.
  * @returns {{html: string, search: {idx: string, route: string, dist: string, flags: string}}} Row markup and filter text.
  */
-function buildGenomeRow(genome, t, rowIndex, dist) {
+function buildGenomeRow(genome, t, rowIndex, dist, selectedSet, showDist) {
   const cross = t && t.crossover;
   const mut = t && t.mutation;
   const cells = [];
@@ -399,7 +463,7 @@ function buildGenomeRow(genome, t, rowIndex, dist) {
     cells.push(`<span class="${cls}">${genome[g]}</span>`);
   }
   const isElite = Boolean(t && t.elite);
-  const isSelected = Boolean(state.selectedSet && state.selectedSet.has(rowIndex));
+  const isSelected = Boolean(selectedSet && selectedSet.has(rowIndex));
   const flags = [];
   if (isElite) flags.push('<span class="flag-pill elite">Elite</span>');
   if (isSelected) flags.push('<span class="flag-pill selected">Selected</span>');
@@ -407,10 +471,11 @@ function buildGenomeRow(genome, t, rowIndex, dist) {
   if (isElite) rowCls += " is-elite";
   if (isSelected) rowCls += " is-selected";
   const distText = dist != null ? formatDistance(dist) : "—";
+  const distCell = showDist ? `<td class="dist">${distText}</td>` : "";
   const html = `<tr class="${rowCls.trim()}">
     <td class="idx">${rowIndex}</td>
     <td><div class="gene-seq">${cells.join("")}</div></td>
-    <td class="dist">${distText}</td>
+    ${distCell}
     <td>${flags.join(" ")}</td>
   </tr>`;
   const search = {

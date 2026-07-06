@@ -15,18 +15,18 @@ class TestSelectionParamsFromDict(unittest.TestCase):
     def test_full_payload(self):
         """All keys present map onto the typed fields."""
         params = SelectionParams.from_dict(
-            {"selection": "roulette", "tournamentSize": 7, "elitism": True}
+            {"selection": "roulette", "tournamentSize": 7, "eliteCount": 2}
         )
         self.assertEqual(params.selection, "roulette")
         self.assertEqual(params.tournament_size, 7)
-        self.assertTrue(params.elitism)
+        self.assertEqual(params.elite_count, 2)
 
     def test_defaults_for_missing_keys(self):
         """Missing keys fall back to tournament selection defaults."""
         params = SelectionParams.from_dict({})
         self.assertEqual(params.selection, "tournament")
         self.assertEqual(params.tournament_size, 3)
-        self.assertFalse(params.elitism)
+        self.assertEqual(params.elite_count, 0)
 
     def test_immutable(self):
         """The dataclass is frozen — fields cannot be reassigned."""
